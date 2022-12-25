@@ -1,0 +1,390 @@
+<div class="container">
+    <h1 part="header" class="headline">Rentenlückenrechner</h1>
+    <div part="intro" class="text-container">
+        <slot name="intro">
+            <p>Sie fragen sich, wie hoch Ihre Rente später ausfällt und ob Ihnen das Geld zum Leben reichen wird?</p>
+            <p>Die Differenz zwischen der zu erwartenden Rente und dem heutigen Einkommen bezeichnet man als Rentenlücke
+                oder auch Versorgungslücke. Mit unserem Rentenrechner finden Sie heraus, wie groß diese Lücke ist!</p>
+            <p>Die Berechnung soll Ihnen helfen, Ihre zukünftige finanzielle Situation besser einzuschätzen. Die
+                ermittelte Rentenlücke ist eine erste Orientierung dafür, wie viel Sie zusätzlich zur gesetzlichen Rente
+                vorsorgen müssen, um auch im Alter Ihren Lebensstandard zu halten. So können Sie Ihre private
+                Altersvorsorge besser planen!</p>
+        </slot>
+    </div>
+    <form part="form" method="post" name="renten-form" class="calculation-container" accept-charset="utf-8"
+          data-show-arrow="left" id="renten-form" action="">
+        <div class="form-container">
+            <div class="headline text-center">Rentenlücke berechnen</div>
+            <div class="alert alert-danger d-none" role="alert">
+                Es ist ein Fehler aufgetreten!
+            </div>
+            <div class="alert alert-warning d-none" role="alert">
+                Ihre angegebenen Daten sind nicht korrekt!
+            </div>
+            <div class="form-floating">
+                <input type="number"
+                       name="netto"
+                       id="netto"
+                       class="form-control"
+                       placeholder=" "
+                       required
+                       autocomplete="off"
+                       data-pattern-message="Der Wert muss größer 0 sein."
+                       value=""
+                       min="0"
+                       aria-describedby="nettoHelpBlock">
+                <label class="col-form-label" for="netto">Monatliches Netto </label>
+                <div id="nettoHelpBlock" class="form-text">
+                    Ihr Nettogehalt, bzw. der Netto-Arbeitslohn, ist die Summe, die nach Abzug aller Abgaben und Steuern
+                    von Gehalt oder Lohn übrig bleibt und von Ihrem Arbeitgeber an Sie ausgezahlt wird.
+                </div>
+            </div>
+            <div class="form-floating">
+                <select name="anzahl" id="anzahl" class="form-select" required aria-describedby="anzahlHelpBlock">
+                    <option value="">Bitte wählen</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                </select>
+                <label class="col-form-label" for="anzahl">Anzahl Gehälter je Jahr</label>
+                <div id="anzahlHelpBlock" class="form-text">
+                    Wie viele Gehälter werden Ihnen im Jahr insgesamt ausgezahlt? In vielen Branchen ist ein 13. oder
+                    14. Gehalt üblich.
+                </div>
+            </div>
+            <div class="form-floating">
+                <select name="stkl" id="stkl" class="form-select" required aria-describedby="stklHelpBlock">
+                    <option value="">Bitte wählen</option>
+                    <option value="1">Steuerklasse 1</option>
+                    <option value="2">Steuerklasse 2</option>
+                    <option value="3">Steuerklasse 3</option>
+                    <option value="4">Steuerklasse 4</option>
+                    <option value="5">Steuerklasse 5</option>
+                    <option value="6">Steuerklasse 6</option>
+                </select>
+                <label class="col-form-label" for="stkl">Steuerklasse</label>
+                <div id="stklHelpBlock" class="form-text">
+                    Die Steuerklasse richtet sich in erster Linie nach dem Familienstand: Steuerklasse 1 gilt
+                    automatisch für alle ledigen, verwitweten, geschiedenen oder dauernd getrennt lebenden Arbeitnehmer.
+                    Alleinerziehende zählt das Finanzamt zur Steuerklasse 2. Verheiratete können je nach Steuerklasse
+                    des Ehepartners den Steuerklassen 3 bis 5 angehören. Wer mehr als einen Job hat, fällt ab dem
+                    zweiten Job in die Steuerklasse 6.
+                </div>
+            </div>
+            <div class="form-floating">
+                <select name="state" id="state" class="form-select" required aria-describedby="stateHelpBlock">
+                    <option value="">Bitte wählen</option>
+                    <option value="Baden-Württemberg">Baden-Württemberg</option>
+                    <option value="Bayern">Bayern</option>
+                    <option value="Berlin">Berlin</option>
+                    <option value="Brandenburg">Brandenburg</option>
+                    <option value="Bremen">Bremen</option>
+                    <option value="Hamburg">Hamburg</option>
+                    <option value="Hessen">Hessen</option>
+                    <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+                    <option value="Niedersachsen">Niedersachsen</option>
+                    <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                    <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                    <option value="Saarland">Saarland</option>
+                    <option value="Sachsen">Sachsen</option>
+                    <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
+                    <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                    <option value="Thüringen">Thüringen</option>
+                </select>
+                <label class="col-form-label" for="state">Bundesland</label>
+                <div id="stateHelpBlock" class="form-text">
+                    Je nach Bundesland können der Berechnung verschiedene Werte zugrunde liegen.
+                </div>
+            </div>
+            <div class="form-floating">
+                <input type="number"
+                       name="geb"
+                       id="geb"
+                       class="form-control"
+                       placeholder=" "
+                       required
+                       autocomplete="off"
+                       value=""
+                       min="${Datum.getUTCFullYear() - 120}"
+                       max="${Datum.getUTCFullYear()}"
+                       aria-describedby="stateHelpBlock">
+                <label class="col-form-label" for="geb">Geburtsjahr</label>
+                <div id="gebHelpBlock" class="form-text">
+                    Das Jahr, in dem Sie geboren wurden, bestimmt unter anderem das Eintrittsalter für die reguläre
+                    Altersrente.
+                </div>
+            </div>
+            <div class="form-floating">
+                <input type="number"
+                       name="alter"
+                       id="alter"
+                       class="form-control"
+                       placeholder=" "
+                       required
+                       autocomplete="off"
+                       data-pattern-message="Der Wert muss größer 0 sein."
+                       value=""
+                       min="12"
+                       max="100"
+                       aria-describedby="alterHelpBlock">
+                <label class="col-form-label" for="alter">Alter bei Berufseinstieg</label>
+                <div class="hint-age d-none">Sie dürfen nicht bereits länger als 1 Jahr Rente beziehen, damit wir Ihre
+                    Rentenlücke berechnen können.
+                </div>
+                <div id="alterHelpBlock" class="form-text">
+                    In welchem Alter haben Sie begonnen, als Arbeitnehmer eine Tätigkeit gegen Entgelt zu entrichten?
+                    Diese Angabe wird benötigt, um zu ermitteln, wie lang Sie bereits in die Rentenversicherung
+                    eingezahlt haben. Es zählt bereits der Beginn einer Berufsausbildung.
+                </div>
+            </div>
+            <div class="form-floating">
+                <select name="rente" id="rente" class="form-select" required aria-describedby="renteHelpBlock">
+                    <option value="">Bitte wählen</option>
+                    <option value="63">mit vollendetem 63. Lebensjahr</option>
+                    <option value="65">mit vollendetem 65. Lebensjahr</option>
+                    <option value="67">mit vollendetem 67. Lebensjahr</option>
+                </select>
+                <label class="col-form-label" for="rente">Wann möchten Sie in Rente gehen?</label>
+                <div id="renteHelpBlock" class="form-text">
+                    Das gewünschte Renteneintrittsalter hat Einfluss auf die Höhe Ihrer Rente.
+                </div>
+            </div>
+            <fieldset class="form-floating">
+                <legend>Besteht bereits eine Vorsorge? (optional)</legend>
+                <div class="form-check">
+                    <input type="radio" name="vorsorgevorhanden" id="vorsorgevorhanden_ja" class="form-check-input"
+                           value="ja">
+                    <label class="form-check-label" for="vorsorgevorhanden_ja">ja</label>
+                </div>
+                <div class="form-check">
+                    <input type="radio" name="vorsorgevorhanden" id="vorsorgevorhanden_nein" class="form-check-input"
+                           value="nein">
+                    <label class="form-check-label" for="vorsorgevorhanden_nein">nein</label>
+                </div>
+                <div class="added-pension-wrapper my-4 d-none">
+                    <div class="added-pension">
+                        <div class="added-pension-headline">Bereits bestehende Vorsorgen:</div>
+                        <div class="added-pension-content"></div>
+                        <div class="culmulated-pension d-none"><span></span> €</div>
+                    </div>
+                </div>
+                <div class="text-start js-more-pension d-none">
+                    <div><label class="mb-2" for="weiterevorsorge_ja">Besteht eine weitere Vorsorge?</label></div>
+                    <div>
+                        <label class="form-radio me-4" for="weiterevorsorge_ja"><input type="radio"
+                                                                                       name="weiterevorsorge"
+                                                                                       id="weiterevorsorge_ja"
+                                                                                       class="form-radio-input me-1"
+                                                                                       value="ja">ja</label>
+                        <label class="form-radio" for="weiterevorsorge_nein"><input type="radio" name="weiterevorsorge"
+                                                                                    id="weiterevorsorge_nein"
+                                                                                    class="form-radio-input me-1"
+                                                                                    value="nein">nein</label>
+                    </div>
+                </div>
+                <div class="text-start position-relative js-pension-type js-collapse-pension-amount form-floating d-none">
+                    <div class="position-absolute tooltip-absolute"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="left"
+                         title=""
+                         data-bs-original-title="Betreiben Sie die Altersvorsorge über Ihren Arbeitgeber oder haben Sie privat Verträge abgeschlossen?">
+                        <span class="icon-vt icon-attention-o"></span>
+                    </div>
+                    <div><label class="mb-2" for="vorsorgeart_betrieblich">Ist die Vorsorge betrieblich oder
+                        privat?</label></div>
+                    <div>
+                        <label class="form-radio me-4" for="vorsorgeart_betrieblich"><input type="radio"
+                                                                                            name="vorsorgeart_1"
+                                                                                            id="vorsorgeart_betrieblich"
+                                                                                            class="form-radio-input me-1 js-initial-required form-control-danger"
+                                                                                            value="betrieblich">betrieblich</label>
+                        <label class="form-radio" for="vorsorgeart_privat"><input type="radio" name="vorsorgeart_1"
+                                                                                  id="vorsorgeart_privat"
+                                                                                  class="form-radio-input me-1 js-initial-required"
+                                                                                  value="privat">privat</label>
+                    </div>
+                </div>
+                <div class="js-pension-amount form-floating d-none">
+                    <input type="number" name="vorsorgebetrag_1" id="vorsorgebetrag"
+                           class="form-control js-additional-pension js-initial-required"
+                           placeholder="Höhe der monatlichen Rente aus dieser Vorsorge in Euro"
+                           data-pattern-message="Der Wert muss größer 0 sein." value="">
+                    <label class="col-form-label" for="vorsorgebetrag">Höhe der monatlichen Rente aus dieser
+                        Vorsorge</label>
+                </div>
+                <div class="text-start js-collapse-more-pension d-none">
+                    <a href="#" class="js-add-insurance btn btn-sm btn-outline-primary js-init-edit-button">weitere
+                        Vorsorge hinzufügen</a>
+                </div>
+            </fieldset>
+            <div id="askHelpBlock" class="form-text">
+                Bereits bestehende Altersvorsorgeverträge verringern Ihre Rentenlücke.
+            </div>
+        </div>
+        <div class="result-container">
+            <div class="headline">Ergebnis</div>
+            <div class="row justify-content-center align-items-center align-items-lg-start">
+                <div class="col-12 col-lg-5 order-lg-last my-4 pe-0 inflation">
+                    <div class="position-relative has-tooltip">
+                        <div class="inflation-legend">Inflation berücksichtigen?</div>
+                        <div class="position-absolute tooltip-absolute"
+                             data-bs-toggle="tooltip"
+                             data-bs-placement="left"
+                             title=""
+                             data-bs-original-title="Die Inflation sorgt dafür, dass Ihre spätere Rente nicht mehr den gleichen Wert haben wird, wie heute. Die Renten werden zwar jährlich angepasst, steigt die Inflation jedoch stärker als die Renten, können Sie sich später von Ihrem Geld weniger kaufen als heute.">
+                            <span class="icon-vt icon-attention-o align-top"></span>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch d-inline-block mt-2 me-2">
+                        <input type="hidden" name="inflationAn" value="0">
+                        <input type="checkbox" name="inflationAn" id="inflationAn"
+                               class="form-check-input js-adt-event js-gtm-event" form="renten-form"
+                               data-event-type="click" data-event-category="versicherung"
+                               data-event-label="rentenluecke" data-event-action="adjust inflation" value="1">
+                        <label class="form-check-label ms-2" for="inflationAn"><span
+                                class="js-inflation-rate">0.0</span>%</label>
+                    </div>
+                    <a class="icon-vt icon-cog inflation-settings" data-bs-toggle="modal" href="#inflation-layer"></a>
+                    <div class="modal fade" id="inflation-layer" tabindex="-1" aria-labelledby="inflation-layer-label"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered vt_modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="inflation-layer-label">Einstellungen</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <label for="inflationsrate">Bitte wählen Sie die angenommene Höhe der
+                                        Inflation</label>
+                                    <div class="slider-container">
+                                        <input type="range" name="inflationsrate" id="inflationsrate"
+                                               class="slider js-tooltip-slider" min="0" max="5" step="0.1"
+                                               form="renten-form" value="2.2">
+                                        <div class="slider-tooltip js-slider-tooltip">2.2%</div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <input type="button" form="renten-form" name="btn-neu-berechnen"
+                                           class="btn btn-primary btn-rente-refresh js-adt-event js-gtm-event"
+                                           value="Neu berechnen" data-bs-dismiss="modal" data-event-type="click"
+                                           data-event-category="versicherung" data-event-label="rentenluecke"
+                                           data-event-action="recalc with changed inflation">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-7 my-4">
+                    <div class="provision-chart-container">
+                        <div class="chartjs-size-monitor">
+                            <div class="chartjs-size-monitor-expand">
+                                <div class=""></div>
+                            </div>
+                            <div class="chartjs-size-monitor-shrink">
+                                <div class=""></div>
+                            </div>
+                        </div>
+                        <div class="provision-chart-sum">
+                            <span class="provision-chart-legend">Rentenlücke</span>
+                            <span class="provision-chart-amount">?</span>
+                        </div>
+                        <canvas id="js-doughnut-chart" class="provision-chart chartjs-render-monitor" width="250"
+                                height="250" style="display: block; width: 250px; height: 250px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <ul class="list-unstyled chart-result-list">
+                <li class="row justify-content-between monthly-requirement position-relative has-tooltip">
+                    <span class="col-8 type">monatlicher Bedarf im Alter</span>
+                    <span class="col-4 text-end amount"><span class="js-monthly-requirement-amount pe-3">?</span></span>
+                    <div class="position-absolute tooltip-absolute" data-bs-toggle="tooltip" data-bs-placement="left"
+                         title="" data-bs-original-title="Experten setzen etwa 80 Prozent des letzten Nettoeinkommens als Richtwert
+                          für den Finanzbedarf im Alter an, da als Rentner einige Ausgaben wegfallen. Dies
+                          ergibt sich z.B. weil kein finanzieller Aufwand für den Arbeitsweg mehr anfällt,
+                          manche Versicherungen nicht mehr gezahlt werden müssen oder das Eigenheim abbezahlt
+                          ist und man dort mietfrei wohnen kann.">
+                        <span class="icon-vt icon-attention-o"></span>
+                    </div>
+                </li>
+                <li class="row justify-content-between future-net-pension position-relative has-tooltip chart-amount-box chart-amount-1 collapse">
+                    <span class="col-8 type">zu erwartende Nettorente</span>
+                    <span class="col-4 text-end amount"><span class="js-future-net-pension-amount pe-3">?</span></span>
+                    <div class="position-absolute tooltip-absolute" data-bs-toggle="tooltip" data-bs-placement="left"
+                         title=""
+                         data-bs-original-title="Auch bei Alterseinkünften werden Sozialabgaben und Steuern fällig. Die Nettorente ist der Geldbetrag, der nach Abzug dieser übrig bleibt.">
+                        <span class="icon-vt icon-attention-o"></span>
+                    </div>
+                </li>
+                <li class="row justify-content-between actual-pension position-relative has-tooltip collapse chart-amount-box chart-amount-2">
+                    <span class="col-8 type">bestehende Vorsorge</span>
+                    <span class="col-4 text-end amount"><span class="js-actual-pension-amount pe-3">?</span></span>
+                    <span class="additional-pension-hint js-additional-pension-hint d-none">*</span>
+                    <div class="position-absolute tooltip-absolute" data-bs-toggle="tooltip" data-bs-placement="left"
+                         title=""
+                         data-bs-original-title="Diese Leistungen erhalten Sie aus Ihrer bestehenden Vorsorge.">
+                        <span class="icon-vt icon-attention-o"></span>
+                    </div>
+                </li>
+                <li class="row justify-content-between pension-gap position-relative has-tooltip chart-amount-box chart-amount-3">
+                    <span class="col-8 type">Rentenlücke</span>
+                    <span class="col-4 text-end amount">
+                  <span class="js-pension-gap-amount pe-3">?</span>
+                </span>
+                    <div class="position-absolute tooltip-absolute"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="left"
+                         title=""
+                         data-bs-original-title="Die Differenz zwischen Ihrer zu erwartenden Rente und dem benötigten Einkommen wird als Rentenlücke bezeichnet.">
+                        <span class="icon-vt icon-attention-o"></span>
+                    </div>
+                    <div class="no-gap-hint-text mt-3 mx-3 d-none">
+                        <strong>Hinweis:</strong> Es konnte keine Rentenlücke ermittelt werden.
+                    </div>
+                </li>
+            </ul>
+            <div class="text-center d-md-none btn-link btn-change">Angaben ändern</div>
+            <div class="additional-pension-hint-text js-additional-pension-hint mt-3 mt-md-0 d-none">
+                * Bitte beachten Sie, dass auch hier in Abhängigkeit von der Art Ihrer Vorsorge eventuell Steuer- und
+                Sozialversicherungsabgaben anfallen.
+            </div>
+        </div>
+        <div class="text-center button-container">
+            <button type="submit" name="btn-berechnen" class="btn">Berechnen</button>
+        </div>
+    </form>
+    <div part="outtro" class="text-container">
+        <slot name="outtro">
+            <p>Private Altersvorsorge ist wichtig, wenn Sie Ihren Lebensstandard im Alter in etwa auf gleichem Niveau
+                halten
+                möchten. Im besten Fall können Sie Ihre Rentenlücke durch eine private Altersvorsorge komplett schließen
+                oder zumindest minimieren!</p>
+            <p>Bitte beachten Sie, dass diese Beispielrechnung keine persönliche Beratung ersetzen kann!</p>
+            <p>Es gibt eine Menge Faktoren, die beeinflussen, wie hoch die Rente am Ende wirklich ausfällt. Diese sind
+                nicht
+                immer einzuschätzen. Hier handelt es sich beispielsweise um Inflation, Steuern, aber auch
+                Zinsentwicklungen
+                mit Auswirkungen auf Sparanlagen. Auch verschiedene Lebensereignisse können Auswirkungen haben, wie ein
+                Jobwechsel, Kinder oder Scheidung.</p>
+            <p>Wir weisen Sie darauf hin, dass die Ergebnisse der Berechnungen lediglich eine vereinfachte und
+                abstrahierte
+                Schätzung darstellt, die als Orientierungshilfe dienen soll. Die modellhafte Rückrechnung auf ein
+                jährliches
+                Bruttoeinkommen basiert auf den Vorgaben des Bundesfinanzministeriums. Der ermittelte monatliche
+                Rentenwert
+                wurde mittels eines speziellen Näherungsverfahrens auf Basis der gemachten Angaben und auf Grundlage der
+                derzeitigen gesetzlichen Rahmenbedingungen berechnet. Um die Handhabung für den Nutzer zu vereinfachen,
+                werden u.a. Annahmen zum Krankenkassenstatus und der Kirchenzugehörigkeit getroffen, die auf
+                statistischen
+                Werten des Bundesgesundheitsministeriums und des Statistischen Bundesamtes beruhen.</p>
+            <p>Bitte beachten Sie, dass die in der Berechnung abgefragten einzelnen Faktoren lediglich einen Ausschnitt
+                Ihrer Situation zum aktuellen Zeitpunkt darstellen. Auch künftige gesetzliche Entwicklungen können hier
+                nicht berücksichtigt werden. Da die Höhe der monatlichen gesetzlichen Erwerbsminderungsrente von vielen
+                verschiedenen individuellen Faktoren abhängt, kann Ihre tatsächliche Rente niedriger, aber auch höher
+                ausfallen.</p>
+            <p>Einen Anspruch kann Ihnen aus keiner der hier gemachten Berechnungen abgeleitet werden. Für die
+                Richtigkeit,
+                Aktualität und Vollständigkeit der Rechenergebnisse übernimmt Jung, DMS. &amp; Cie. keine Haftung.</p>
+        </slot>
+    </div>
+</div>

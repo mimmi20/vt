@@ -90,7 +90,7 @@ jobs:
           persist-credentials: false
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.22.0"
+        uses: "shivammathur/setup-php@2.23.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "none, phar, json, opcache, ${{ join(fromJson(needs.supported-versions-matrix.outputs.extensions), ', ') }}, ${{ inputs.extensions }}"
@@ -136,7 +136,7 @@ jobs:
           persist-credentials: false
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.22.0"
+        uses: "shivammathur/setup-php@2.23.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "none, phar, json, opcache, ${{ join(fromJson(needs.supported-versions-matrix.outputs.extensions), ', ') }}, ${{ inputs.extensions }}"
@@ -192,7 +192,7 @@ jobs:
           persist-credentials: false
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.22.0"
+        uses: "shivammathur/setup-php@2.23.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "none, phar, json, opcache, ${{ join(fromJson(needs.supported-versions-matrix.outputs.extensions), ', ') }}, ${{ inputs.extensions }}"
@@ -244,7 +244,7 @@ jobs:
           persist-credentials: false
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.22.0"
+        uses: "shivammathur/setup-php@2.23.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "none, phar, json, opcache, ${{ join(fromJson(needs.supported-versions-matrix.outputs.extensions), ', ') }}, ${{ inputs.extensions }}"
@@ -289,7 +289,7 @@ jobs:
           persist-credentials: false
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.22.0"
+        uses: "shivammathur/setup-php@2.23.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "none, phar, json, opcache, ${{ join(fromJson(needs.supported-versions-matrix.outputs.extensions), ', ') }}, ${{ inputs.extensions }}"
@@ -342,7 +342,7 @@ jobs:
           persist-credentials: false
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.22.0"
+        uses: "shivammathur/setup-php@2.23.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "none, phar, json, opcache, ${{ join(fromJson(needs.supported-versions-matrix.outputs.extensions), ', ') }}, ${{ inputs.extensions }}"
@@ -391,7 +391,7 @@ jobs:
           persist-credentials: false
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.22.0"
+        uses: "shivammathur/setup-php@2.23.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "none, phar, json, opcache, ${{ join(fromJson(needs.supported-versions-matrix.outputs.extensions), ', ') }}, ${{ inputs.extensions }}"

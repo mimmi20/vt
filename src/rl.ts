@@ -1,11 +1,19 @@
 
-import Chart from 'chart.js/auto';
+import Chart, {TooltipItem} from 'chart.js/auto';
 import { createPopper } from '@popperjs/core/lib/popper-lite.js';
 import preventOverflow from '@popperjs/core/lib/modifiers/preventOverflow.js';
 import flip from '@popperjs/core/lib/modifiers/flip.js';
+import Rentenluecke from './scripts/rentenluecke'
+import * as LZZ from './scripts/lzz';
+import * as KRV from './scripts/krv-table';
+import VorsorgeList from "./vorsorge-list";
+
+customElements.define('vorsorge-list', VorsorgeList);
 
 class RL extends HTMLElement {
   private root: ShadowRoot;
+  private chartObject: Chart|null = null;
+
   constructor() {
     super();
 
@@ -13,23 +21,119 @@ class RL extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log('connectedCallback hook');
     this.root.innerHTML = this.render();
 
     const forms = this.root.querySelectorAll<HTMLFormElement>('.needs-validation');
+    const vorsorgeLists = this.root.querySelectorAll<HTMLFormElement>('vorsorge-list');
 
     forms.forEach(form => {
       form.addEventListener('submit', event => {
         event.preventDefault();
         event.stopPropagation();
 
-        form.checkValidity();
+        const valid = form.checkValidity();
 
         form.classList.add('was-validated');
+
+        vorsorgeLists.forEach(vorsorgeList => {
+          vorsorgeList.classList.add('was-validated');
+        });
+
+        if (valid) {
+          const data = new FormData(form),
+              state = data.get('state'),
+              stkl = data.get('stkl'),
+              netto = data.get('netto'),
+              anzahl = data.get('anzahl'),
+              geb = data.get('geb'),
+              rente = data.get('rente'),
+              alter = data.get('alter'),
+              inflationsrate = data.get('inflationsrate'),
+              inflationAn = data.get('inflationAn');
+
+          if (null !== state && null !== stkl && null !== netto) {
+            const calculationResult = Rentenluecke.calculate(
+                state.toString() || '',
+                parseInt(stkl.toString(), 10),
+                parseInt(netto.toString(), 10),
+                parseInt((anzahl || 0).toString(), 10),
+                parseInt((geb || 0).toString(), 10),
+                parseInt((rente || 0).toString(), 10),
+                parseInt((alter || 0).toString(), 10),
+                parseFloat((inflationsrate || 0.0).toString()),
+                !!(inflationAn || false),
+                LZZ.LZZ_JAHR,
+                KRV.KRV_TABELLE_ALLGEMEIN,
+                true, // kinderlos u. über 23J.
+                1, // Kirchensteuer berechnen
+                0.0 // Anzahl Kinderfreibeträge
+            );
+
+            if (!calculationResult.valid) {
+              return;
+            }
+
+            const monatsBedarf = calculationResult.monatsBedarf || 0,
+                monatsRente = calculationResult.monatsRente || 0,
+                kv = calculationResult.kv || 0,
+                steuer = calculationResult.steuer || 0,
+                erwarteteRente = calculationResult.nettoRente || 0;
+
+            let bestehendeVorsorge = 0;
+
+            /*
+            pensions.forEach(pension => {
+              bestehendeVorsorge += pension.amount;
+            })
+             */
+
+            let rentenluecke = monatsBedarf - (erwarteteRente + bestehendeVorsorge);
+
+            if (rentenluecke <= 0) {
+              rentenluecke = 0;
+            }
+
+            const resultData = {
+              type: 'rentenluecke',
+              monatsBedarf: monatsBedarf,
+              monatsRente: monatsRente,
+              kv: kv,
+              steuer: steuer,
+            };
+
+            document.dispatchEvent(
+                new CustomEvent('jdcvt.event', {
+                  detail: resultData,
+                  bubbles: true, // Whether the event will bubble up through the DOM or not
+                  cancelable: true, // Whether the event may be canceled or not
+                })
+            );
+
+            const chart = this.root.getElementById('js-doughnut-chart');
+
+            if (null === chart || !(chart instanceof HTMLCanvasElement)) {
+              return;
+            }
+
+            this.updateChart(erwarteteRente, bestehendeVorsorge, rentenluecke);
+
+
+            const pensionGapAmount = this.root.getElementById('pension-gap-amount');
+            const monthlyRequirementAmount = this.root.getElementById('monthly-requirement-amount');
+
+            if (null !== pensionGapAmount && pensionGapAmount instanceof HTMLOutputElement) {
+              pensionGapAmount.value = new Intl.NumberFormat('de-DE', {style: 'currency', currency: 'EUR'}).format(rentenluecke);
+            }
+
+            if (null !== monthlyRequirementAmount && monthlyRequirementAmount instanceof HTMLOutputElement) {
+              monthlyRequirementAmount.value = new Intl.NumberFormat('de-DE', {style: 'currency', currency: 'EUR'}).format(monatsBedarf);
+            }
+          }
+        }
       }, false);
     });
 
-    const fields = this.root.querySelectorAll<HTMLFormElement>('.needs-validation input, .needs-validation select');
+    const fields = this.root.querySelectorAll<HTMLInputElement|HTMLSelectElement>('.needs-validation input, .needs-validation select');
 
     fields.forEach(field => {
       field.addEventListener('blur', event => {
@@ -38,6 +142,27 @@ class RL extends HTMLElement {
 
         field.classList.add('was-edited');
       }, false);
+    });
+
+    const pensionsAvailableFields = this.root.querySelectorAll<HTMLInputElement>('.js-pensions-available');
+    const pensionsFields = this.root.querySelectorAll<HTMLInputElement>('.pensions-available');
+
+    pensionsAvailableFields.forEach(field => {
+      field.addEventListener('change', event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if ('ja' === field.value) {
+          pensionsFields.forEach(pensionsField => {
+            pensionsField.classList.remove('d-none');
+          });
+        }
+        if ('nein' === field.value) {
+          pensionsFields.forEach(pensionsField => {
+            pensionsField.classList.add('d-none');
+          });
+        }
+      });
     });
 
     const tooltipButtons = this.root.querySelectorAll<HTMLButtonElement>('.has-tooltip button');
@@ -101,7 +226,45 @@ class RL extends HTMLElement {
       });
     });
 
+    const inflationAn = this.root.getElementById('inflationAn');
+    const inflationsRate = this.root.getElementById('inflationsrate');
     const inflationsButtons = this.root.querySelectorAll<HTMLButtonElement>('.inflation-settings');
+
+    if (null !== inflationAn && null !== inflationsRate && inflationAn instanceof HTMLInputElement && inflationsRate instanceof HTMLInputElement) {
+      inflationAn.addEventListener('change', event => {
+        if (null === event.target || !(event.target instanceof HTMLInputElement) || !(inflationsRate instanceof HTMLInputElement)) {
+          return;
+        }
+
+        if (event.target.checked) {
+          inflationsButtons.forEach((button: HTMLButtonElement): void => {
+            button.removeAttribute('disabled');
+          });
+        } else {
+          inflationsButtons.forEach((button: HTMLButtonElement): void => {
+            button.setAttribute('disabled', '');
+          });
+
+          inflationsRate.value = '2.2';
+          inflationsRate.dispatchEvent(
+              new InputEvent('input', {
+                bubbles: false, // Whether the event will bubble up through the DOM or not
+                cancelable: true, // Whether the event may be canceled or not
+              })
+          );
+        }
+
+        forms.forEach(form => {
+          form.dispatchEvent(
+              new SubmitEvent('submit', {
+                bubbles: false, // Whether the event will bubble up through the DOM or not
+                cancelable: true, // Whether the event may be canceled or not
+              })
+          );
+        });
+      }, false);
+    }
+
     const layer = this.root.getElementById('inflation-layer');
 
     inflationsButtons.forEach((button: HTMLButtonElement): void => {
@@ -113,6 +276,8 @@ class RL extends HTMLElement {
         event.preventDefault();
         event.stopPropagation();
 
+        this.slider();
+
         layer.showModal();
         layer.setAttribute('aria-hidden', 'false');
 
@@ -120,22 +285,24 @@ class RL extends HTMLElement {
       }, false);
     });
 
-    const inflationsrate = this.root.getElementById('inflationsrate');
-
-    if (null !== inflationsrate && inflationsrate instanceof HTMLInputElement) {
+    if (null !== inflationsRate && inflationsRate instanceof HTMLInputElement) {
       const sliderTooltips = this.root.querySelectorAll<HTMLOutputElement>('.slider-tooltip');
       const sliderRate = this.root.querySelectorAll<HTMLOutputElement>('.inflation-rate');
 
-      inflationsrate.addEventListener('input', event => {
+      inflationsRate.addEventListener('input', event => {
         event.preventDefault();
         event.stopPropagation();
 
         sliderTooltips.forEach(sliderTooltip => {
-          sliderTooltip.value = inflationsrate.value + '%';
+          sliderTooltip.value = inflationsRate.value + '%';
         });
         sliderRate.forEach(sliderTooltip => {
-          sliderTooltip.value = inflationsrate.value + '%';
+          sliderTooltip.value = inflationsRate.value + '%';
         });
+
+        console.log('slider');
+
+        this.slider();
       }, false);
     }
 
@@ -151,46 +318,90 @@ class RL extends HTMLElement {
         event.stopPropagation();
 
         layer.close();
+        layer.setAttribute('aria-hidden', 'true');
 
         forms.forEach(form => {
           form.dispatchEvent(
-              new SubmitEvent('submit')
+              new SubmitEvent('submit', {
+                bubbles: false, // Whether the event will bubble up through the DOM or not
+                cancelable: true, // Whether the event may be canceled or not
+              })
           );
         });
       }, false);
     });
 
-    const erwarteteRenteProzent = 7;
-    const bestehendeVorsorgeProzent = 2;
-    const rentenlueckeProzent = 100;
+    const erwarteteRente = 0;
+    const bestehendeVorsorge = 0;
+    const rentenluecke = 0;
     const chart = this.root.getElementById('js-doughnut-chart');
 
     if (null === chart || !(chart instanceof HTMLCanvasElement)) {
       return;
     }
 
-    new Chart(
-        chart,
-        {
-          type: 'doughnut',
-          options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            // @ts-ignore
-            cutoutPercentage: 93
-          },
-          data: {
-            datasets: [{
-              data: [erwarteteRenteProzent, bestehendeVorsorgeProzent, rentenlueckeProzent],
-              backgroundColor: ['rgb(44, 193, 213)', 'rgb(0, 94, 151)', 'rgb(255, 30, 0)'],
-              borderColor: ['#ffffff', '#888', '#000'],
-              borderWidth: 0,
-              borderAlign: 'inner',
-              weight: 0.1
-            }]
+    if (null === this.chartObject) {
+      this.chartObject = new Chart(
+          chart,
+          {
+            type: 'doughnut',
+            options: {
+              locale: 'de-DE',
+              responsive: true,
+              maintainAspectRatio: true,
+              // @ts-ignore
+              cutoutPercentage: 93,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                title: {
+                  display: true,
+                  align: 'center',
+                  position: 'bottom',
+                  text: `Rentenlücke: ${new Intl.NumberFormat('de-DE', {
+                    style: 'currency',
+                    currency: 'EUR'
+                  }).format(rentenluecke)}`
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context: TooltipItem<any>): string {
+                      let label = context.dataset.label || '';
+
+                      if (context.parsed !== null) {
+                        if (label) {
+                          label += ': ';
+                        }
+
+                        label += new Intl.NumberFormat('de-DE', {
+                          style: 'currency',
+                          currency: 'EUR'
+                        }).format(context.parsed);
+                      }
+
+                      return label;
+                    }
+                  }
+                }
+              }
+            },
+            data: {
+              labels: ['zu erwartende Nettorente', 'bestehende Vorsorge', 'Rentenlücke'],
+              datasets: [{
+                data: [erwarteteRente, bestehendeVorsorge, rentenluecke],
+                backgroundColor: ['#2cc1d5', '#005e97', '#ff1f00'],
+                borderColor: ['#ffffff', '#888888', '#000000'],
+                borderWidth: 0,
+                borderAlign: 'inner',
+                weight: 0.1
+              }]
+            }
           }
-        }
-    );
+      );
+    } else {
+      this.updateChart(erwarteteRente, bestehendeVorsorge, rentenluecke);
+    }
   }
 
   attributeChangedCallback(/*attrName: string, oldVal: string, newVal: string/**/) {
@@ -228,7 +439,7 @@ class RL extends HTMLElement {
         .container {
             all: initial;
         }
-        .text-container, .calculation-container {
+        .container, .text-container, .calculation-container {
             width: 100%;
         }
         .text-container {
@@ -268,6 +479,7 @@ class RL extends HTMLElement {
                 'graph inflation'
                 'overview overview';
             grid-auto-rows: min-content;
+            grid-template-columns: 58.4% 41.6%;
         }
         .button-container {
             grid-area: button;
@@ -430,6 +642,11 @@ class RL extends HTMLElement {
         .form-text {
             color: var(--vt-helptext-color, #6c757d);
         }
+        .optional~.form-text, .inline-block~.form-text {
+            padding: 0.25rem 0.75rem 0.25rem 0;
+        }
+        .pensions-available {
+        }
         .text-center {
             text-align: center;
         }
@@ -518,7 +735,8 @@ class RL extends HTMLElement {
         }
         .provision-chart-container {
             grid-area: graph;
-            width: 10.9375rem;
+            width: 100%;
+            flex: 0 0 auto
             height: fit-content;
             margin: 0 auto;
             overflow: hidden;
@@ -589,6 +807,7 @@ class RL extends HTMLElement {
         .modal {
             border: none;
             padding: 0;
+            overflow: hidden;
         }
         .modal[open] {
             border: 1px solid rgba(0,0,0,.2);
@@ -640,7 +859,7 @@ class RL extends HTMLElement {
         .slider-container {
             width: 100%;
             position: relative;
-            margin-top: 0.9375rem;
+            margin-top: 1.9375rem;
         }
         .slider-container .slider {
             -webkit-appearance: none;
@@ -657,7 +876,7 @@ class RL extends HTMLElement {
             height: auto;
             padding: 0.1875rem 0.625rem;
             position: absolute;
-            bottom: 2.5625rem;
+            bottom: 1.5625rem;
             left: 50%;
             text-align: center;
             font-size: 0.875rem;
@@ -758,22 +977,22 @@ class RL extends HTMLElement {
     return `
       ${this.getStyle()}
       <div class="container">
-        <h1 class="headline">Rentenlückenrechner</h1>
+        <div class="headline">
+          <slot name="header"></slot>
+        </div>
         <div class="text-container">
-          <slot name="intro">
-            <p>Sie fragen sich, wie hoch Ihre Rente später ausfällt und ob Ihnen das Geld zum Leben reichen wird?</p>
-            <p>Die Differenz zwischen der zu erwartenden Rente und dem heutigen Einkommen bezeichnet man als Rentenlücke oder auch Versorgungslücke. Mit unserem Rentenrechner finden Sie heraus, wie groß diese Lücke ist!</p>
-            <p>Die Berechnung soll Ihnen helfen, Ihre zukünftige finanzielle Situation besser einzuschätzen. Die ermittelte Rentenlücke ist eine erste Orientierung dafür, wie viel Sie zusätzlich zur gesetzlichen Rente vorsorgen müssen, um auch im Alter Ihren Lebensstandard zu halten. So können Sie Ihre private Altersvorsorge besser planen!</p>
-          </slot>
+          <slot name="intro"></slot>
         </div>
         <div class="calculation-container">
           <form class="form-container needs-validation" name="renten-form" id="renten-form" accept-charset="utf-8" novalidate>
-            <div class="headline text-center">Rentenlücke berechnen</div>
+            <div class="headline text-center">
+              <slot name="form-header">Form Header</slot>
+            </div>
             <div class="alert alert-danger d-none" role="alert">
-              Es ist ein Fehler aufgetreten!
+              <slot name="alert-danger">Es ist ein Fehler aufgetreten!</slot>
             </div>
             <div class="alert alert-warning" role="alert">
-              Ihre angegebenen Daten sind nicht korrekt!
+              <slot name="alert-warning">Ihre angegebenen Daten sind nicht korrekt!</slot>
             </div>
             <div class="form-floating">
               <input type="number" 
@@ -786,7 +1005,7 @@ class RL extends HTMLElement {
                      value="" 
                      min="1" 
                      aria-describedby="nettoHelpBlock">
-              <label class="col-form-label" for="netto">Monatliches Netto </label>    
+              <label class="col-form-label" for="netto">Monatliches Netto</label>    
               <div id="nettoHelpBlock" class="form-text">
                 Ihr Nettogehalt, bzw. der Netto-Arbeitslohn, ist die Summe, die nach Abzug aller Abgaben und Steuern von Gehalt oder Lohn übrig bleibt und von Ihrem Arbeitgeber an Sie ausgezahlt wird.
               </div>
@@ -901,72 +1120,14 @@ class RL extends HTMLElement {
               </div>
               <div class="invalid-feedback">Bitte wählen Sie aus, mit welchem Alter Sie in Rente gehen wollen.</div>
             </div>
-            <fieldset class="form-floating">
-              <legend class="optional">Besteht bereits eine Vorsorge?</legend>
-              <div class="form-check">
-                <input type="radio" name="vorsorgevorhanden" id="vorsorgevorhanden_ja" class="form-check-input" value="ja">
-                <label class="form-check-label" for="vorsorgevorhanden_ja">ja</label>
-              </div>
-              <div class="form-check">
-                <input type="radio" name="vorsorgevorhanden" id="vorsorgevorhanden_nein" class="form-check-input" value="nein">
-                <label class="form-check-label" for="vorsorgevorhanden_nein">nein</label>
-              </div>
-              <div class="added-pension-wrapper my-4 d-none">
-                <div class="added-pension">
-                  <div class="added-pension-headline">Bereits bestehende Vorsorgen:</div>
-                  <div class="added-pension-content"></div>
-                  <div class="culmulated-pension d-none"><span></span> €</div>
-                </div>
-              </div>
-              <div class="text-start js-more-pension d-none">
-                <div><label class="mb-2" for="weiterevorsorge_ja">Besteht eine weitere Vorsorge?</label></div>
-                <div>
-                  <label class="form-radio me-4" for="weiterevorsorge_ja"><input type="radio" name="weiterevorsorge" id="weiterevorsorge_ja" class="form-radio-input me-1" value="ja">ja</label>
-                  <label class="form-radio" for="weiterevorsorge_nein"><input type="radio" name="weiterevorsorge" id="weiterevorsorge_nein" class="form-radio-input me-1" value="nein">nein</label>
-                </div>
-              </div>
-              <div class="text-start position-relative js-pension-type js-collapse-pension-amount form-floating d-none">
-                <div class="position-absolute tooltip-absolute" 
-                     data-bs-toggle="tooltip" 
-                     data-bs-placement="left" 
-                     title="" 
-                     data-bs-original-title="Betreiben Sie die Altersvorsorge über Ihren Arbeitgeber oder haben Sie privat Verträge abgeschlossen?">
-                  <span class="icon-vt icon-attention-o"></span>
-                </div>
-                <div><label class="mb-2" for="vorsorgeart_betrieblich">Ist die Vorsorge betrieblich oder privat?</label></div>
-                <div>
-                  <label class="form-radio me-4" for="vorsorgeart_betrieblich"><input type="radio" name="vorsorgeart_1" id="vorsorgeart_betrieblich" class="form-radio-input me-1 js-initial-required form-control-danger" value="betrieblich">betrieblich</label>
-                  <label class="form-radio" for="vorsorgeart_privat"><input type="radio" name="vorsorgeart_1" id="vorsorgeart_privat" class="form-radio-input me-1 js-initial-required" value="privat">privat</label>
-                </div>
-              </div>
-              <div class="js-pension-amount form-floating d-none">
-                  <input type="number" name="vorsorgebetrag_1" id="vorsorgebetrag" class="form-control js-additional-pension js-initial-required" placeholder="Höhe der monatlichen Rente aus dieser Vorsorge in Euro" data-pattern-message="Der Wert muss größer 0 sein." value="">                            
-                  <label class="col-form-label" for="vorsorgebetrag">Höhe der monatlichen Rente aus dieser Vorsorge</label>                        
-              </div>
-              <div class="text-start js-collapse-more-pension d-none">
-                <a href="#" class="js-add-insurance btn btn-sm btn-outline-primary js-init-edit-button">weitere Vorsorge hinzufügen</a>
-              </div>
-            </fieldset>      
-            <div id="askHelpBlock" class="form-text">
-              Bereits bestehende Altersvorsorgeverträge verringern Ihre Rentenlücke.
-            </div>
+            <vorsorge-list></vorsorge-list>
           </form>
           <div class="result-container">
-            <div class="headline text-center">Ergebnis</div>
+            <div class="headline text-center">
+              <slot name="ergebnis-header">Ergebnis</slot>
+            </div>
             <div class="provision-chart-container">
-              <div class="chartjs-size-monitor">
-                <div class="chartjs-size-monitor-expand">
-                  <div class=""></div>
-                </div>
-                <div class="chartjs-size-monitor-shrink">
-                  <div class=""></div>
-                </div>
-              </div>
-              <div class="provision-chart-sum">
-                <span class="provision-chart-legend">Rentenlücke</span>
-                <span class="provision-chart-amount">?</span>
-              </div>
-              <canvas id="js-doughnut-chart" class="provision-chart chartjs-render-monitor" width="250" height="250" style="display: block; width: 250px; height: 250px;"></canvas>
+              <canvas id="js-doughnut-chart" class="chartjs-render-monitor" width="250" height="250" style="display: block; width: 250px; height: 250px;"></canvas>
             </div>
             <div class="inflation">
               <div class="inflation-label position-relative has-tooltip">
@@ -981,9 +1142,9 @@ class RL extends HTMLElement {
               </div>
               <div class="form-switch inflation-switch">
                 <input type="checkbox" name="inflationAn" id="inflationAn" class="form-check-input" form="renten-form" data-event-type="click" data-event-category="versicherung" data-event-label="rentenluecke" data-event-action="adjust inflation">                                
-                <label class="form-check-label ms-2" for="inflationAn"><output for="inflationsrate" class="inflation-rate">0.0%</output></label>                            
+                <label class="form-check-label ms-2" for="inflationAn"><output for="inflationsrate" class="inflation-rate">2.2%</output></label>                            
               </div>
-              <button class="btn inflation-settings">
+              <button class="btn inflation-settings" disabled>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
                   <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
                 </svg>
@@ -998,7 +1159,7 @@ class RL extends HTMLElement {
                     <label for="inflationsrate">Bitte wählen Sie die angenommene Höhe der Inflation</label>                                            
                     <div class="slider-container">
                       <input type="range" name="inflationsrate" id="inflationsrate" class="slider js-tooltip-slider" min="0" max="12" step="0.1" form="renten-form" value="2.2">                                                
-                      <output for="inflationsrate" class="slider-tooltip">0.0%</output>
+                      <output for="inflationsrate" class="slider-tooltip" style="left: 50%">2.2%</output>
                     </div>
                   </div>
                   <div class="modal-footer">
@@ -1058,17 +1219,54 @@ class RL extends HTMLElement {
           </div>
         </div>
         <div class="text-container">
-          <slot name="outtro">
-            <p>Private Altersvorsorge ist wichtig, wenn Sie Ihren Lebensstandard im Alter in etwa auf gleichem Niveau halten möchten. Im besten Fall können Sie Ihre Rentenlücke durch eine private Altersvorsorge komplett schließen oder zumindest minimieren!</p>
-            <p>Bitte beachten Sie, dass diese Beispielrechnung keine persönliche Beratung ersetzen kann!</p>
-            <p>Es gibt eine Menge Faktoren, die beeinflussen, wie hoch die Rente am Ende wirklich ausfällt. Diese sind nicht immer einzuschätzen. Hier handelt es sich beispielsweise um Inflation, Steuern, aber auch Zinsentwicklungen mit Auswirkungen auf Sparanlagen. Auch verschiedene Lebensereignisse können Auswirkungen haben, wie ein Jobwechsel, Kinder oder Scheidung.</p>
-            <p>Wir weisen Sie darauf hin, dass die Ergebnisse der Berechnungen lediglich eine vereinfachte und abstrahierte Schätzung darstellt, die als Orientierungshilfe dienen soll. Die modellhafte Rückrechnung auf ein jährliches Bruttoeinkommen basiert auf den Vorgaben des Bundesfinanzministeriums. Der ermittelte monatliche Rentenwert wurde mittels eines speziellen Näherungsverfahrens auf Basis der gemachten Angaben und auf Grundlage der derzeitigen gesetzlichen Rahmenbedingungen berechnet. Um die Handhabung für den Nutzer zu vereinfachen, werden u.a. Annahmen zum Krankenkassenstatus und der Kirchenzugehörigkeit getroffen, die auf statistischen Werten des Bundesgesundheitsministeriums und des Statistischen Bundesamtes beruhen.</p>
-            <p>Bitte beachten Sie, dass die in der Berechnung abgefragten einzelnen Faktoren lediglich einen Ausschnitt Ihrer Situation zum aktuellen Zeitpunkt darstellen. Auch künftige gesetzliche Entwicklungen können hier nicht berücksichtigt werden. Da die Höhe der monatlichen gesetzlichen Erwerbsminderungsrente von vielen verschiedenen individuellen Faktoren abhängt, kann Ihre tatsächliche Rente niedriger, aber auch höher ausfallen.</p>
-            <p>Einen Anspruch kann Ihnen aus keiner der hier gemachten Berechnungen abgeleitet werden. Für die Richtigkeit, Aktualität und Vollständigkeit der Rechenergebnisse übernimmt Jung, DMS. &amp; Cie. keine Haftung.</p>
-          </slot>
+          <slot name="outtro"></slot>
         </div>
       </div>
     `;
+  }
+
+  updateChart(erwarteteRente: number, bestehendeVorsorge: number, rentenluecke: number): void {
+    if (null === this.chartObject) {
+      return;
+    }
+
+    this.chartObject.data.datasets[0].data = [erwarteteRente, bestehendeVorsorge, rentenluecke];
+
+    if (this.chartObject.options.plugins && this.chartObject.options.plugins.title) {
+      this.chartObject.options.plugins.title.text = `Rentenlücke: ${new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR'
+      }).format(rentenluecke)}`;
+    }
+
+    this.chartObject.update();
+  }
+
+  slider(): void {
+    const sliderTooltips = this.root.querySelectorAll<HTMLOutputElement>('.slider-tooltip');
+
+    if (sliderTooltips.length === 0) {
+      return;
+    }
+
+    const sliders = this.root.querySelectorAll<HTMLInputElement>('.js-tooltip-slider');
+
+    sliders.forEach((slider: HTMLInputElement) => {
+      const sliderValue = parseFloat(slider.value),
+          sliderMax = parseFloat(slider.max),
+          sliderMin = parseFloat(slider.min);
+
+      if (isNaN(sliderValue)) {
+        slider.value = '0';
+      }
+
+      const sliderTooltip = sliderTooltips[0],
+          value = ((sliderValue - sliderMin) * 100) / (sliderMax - sliderMin),
+          percentOfRange = isNaN(value) ? 0 : value,
+          newPosition = -18 - (15 * percentOfRange) / 100;
+
+      sliderTooltip.style.left = `calc(${percentOfRange}% + (${newPosition}px))`;
+    });
   }
 }
 

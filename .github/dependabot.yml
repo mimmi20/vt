@@ -3,10 +3,13 @@
 version: 2
 
 updates:
-  - package-ecosystem: "composer"
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "UTC"
     open-pull-requests-limit: 10
     reviewers:
       - "mimmi20"
@@ -18,7 +21,7 @@ updates:
     target-branch: "master"
     commit-message:
       include: "scope"
-      prefix: "composer"
+      prefix: "npm"
 #    ignore:
 #      - dependency-name: infection/infection
 #        versions:
@@ -30,7 +33,10 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "UTC"
     open-pull-requests-limit: 10
     reviewers:
       - "mimmi20"

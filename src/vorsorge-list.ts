@@ -11,23 +11,103 @@ class VorsorgeList extends HTMLElement {
   }
 
   connectedCallback() {
-    this.render();
+    this.root.innerHTML = this.render();
+
+    const pensionsAvailableFields = this.root.querySelectorAll<HTMLInputElement>('.js-pensions-available');
+    const pensionsFields = this.root.querySelectorAll<HTMLInputElement>('.pensions-available');
+    const addButtons = this.root.querySelectorAll<HTMLTableSectionElement>('.js-add-button');
+
+    pensionsAvailableFields.forEach(field => {
+      field.addEventListener('change', event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.pensionExsists = field.checked;
+
+        if (field.checked) {
+          pensionsFields.forEach(pensionsField => {
+            pensionsField.classList.remove('d-none');
+          });
+        } else {
+          pensionsFields.forEach(pensionsField => {
+            pensionsField.classList.add('d-none');
+          });
+
+          this.pensions = [];
+
+          this.renderTable();
+        }
+      });
+    });
+    pensionsFields.forEach(pensionsField => {
+      if (this.pensionExsists) {
+        pensionsField.classList.remove('d-none');
+      } else {
+        pensionsField.classList.add('d-none');
+      }
+    });
+    addButtons.forEach(addButton => {
+      addButton.addEventListener('click', () => {
+        const vorsorgeart = this.root.querySelectorAll<HTMLInputElement>('[name="vorsorgeart"]:checked');
+        const vorsorgebetrag = this.root.querySelectorAll<HTMLInputElement>('[name="vorsorgebetrag"]');
+
+        if (vorsorgeart.length === 0 || vorsorgebetrag.length === 0) {
+          return;
+        }
+
+        this.pensions.push({id: this.pensions.length, amount: parseInt(vorsorgebetrag[0].value, 10), type: vorsorgeart[0].value});
+
+        this.renderTable();
+
+        let summaryPension = 0;
+
+        this.pensions.forEach(pension => {
+          summaryPension += pension.amount;
+        });
+
+        this.dispatchEvent(
+          new CustomEvent(
+            'pension.added',
+            {
+              'detail': {
+                summary: summaryPension,
+                bubbles: true, // Whether the event will bubble up through the DOM or not
+                cancelable: false, // Whether the event may be canceled or not
+              }
+            }
+          )
+        );
+      }, false);
+    });
+
+    this.renderTable();
   }
 
-  attributeChangedCallback(/*attrName: string, oldVal: string|null, newVal: string|null/**/) {
-    this.render();
+  attributeChangedCallback(attrName: string, oldVal: string|null, newVal: string|null) {
+    if ('class' === attrName) {
+      const bases = this.root.querySelectorAll<HTMLInputElement>('.list-base');
+
+      bases.forEach(base => {
+        if (null !== oldVal) {
+          base.classList.remove(oldVal);
+        }
+
+        if (null !== newVal) {
+          base.classList.add(newVal);
+        }
+      });
+    }
   }
 
   diconnectedCallback() {
     // nothing to do at the moment
-    console.log('diconnectedCallback hook');
   }
 
-  static get observedAttributes() {
+  static get observedAttributes(): Array<string> {
     return ['class'];
   }
 
-  get class() {
+  get class(): string|null {
     return this.getAttribute('class');
   }
 
@@ -39,7 +119,35 @@ class VorsorgeList extends HTMLElement {
     }
   }
 
-  getStyle() {
+  private renderTable(): void {
+    const pensionsAvailable = this.root.querySelectorAll<HTMLTableSectionElement>('.js-pensions-rows-available');
+    const noPensionsAvailable = this.root.querySelectorAll<HTMLTableSectionElement>('.js-no-pensions-rows-available');
+
+    noPensionsAvailable.forEach(tfoot => {
+      if (this.pensions.length) {
+        tfoot.classList.add('d-none');
+      } else {
+        tfoot.classList.remove('d-none');
+      }
+    });
+    pensionsAvailable.forEach(tbody => {
+      tbody.innerHTML = '';
+
+      if (this.pensions.length) {
+        tbody.classList.remove('d-none');
+
+        this.pensions.forEach(pension => {
+          tbody.innerHTML += `<tr class="added-pension-item row row-nowrap" data-id="${pension.id}"><td class="added-pension-type col-8 pe-0">${pension.type}</td><td class="added-pension-amount col-4 text-end position-relative">${new Intl.NumberFormat('de-DE', {style: 'currency', currency: 'EUR'}).format(pension.amount)}</td></tr>`;
+        });
+      } else {
+        tbody.classList.add('d-none');
+      }
+    });
+
+
+  }
+
+  private getStyle(): string {
     return `
     <style>
         *,*::before,*::after {
@@ -94,9 +202,9 @@ class VorsorgeList extends HTMLElement {
             background-position: right calc(0.375em + 0.1875rem) center;
             background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
         }
-        .was-validated :invalid~.invalid-feedback, 
-        .was-edited:invalid~.invalid-feedback, 
-        .was-validated [min][max]:out-of-range~.invalid-min-max-feedback, 
+        .was-validated :invalid~.invalid-feedback,
+        .was-edited:invalid~.invalid-feedback,
+        .was-validated [min][max]:out-of-range~.invalid-min-max-feedback,
         .was-edited[min][max]:out-of-range~.invalid-min-max-feedback,
         .was-validated [min]:not([max]):out-of-range~.invalid-min-feedback,
         .was-edited[min]:not([max]):out-of-range~.invalid-min-feedback,
@@ -264,6 +372,17 @@ class VorsorgeList extends HTMLElement {
         .text-end {
             text-align: end !important;
         }
+        .pe-0 {
+            padding-right: 0 !important;
+        }
+        .col-8 {
+            flex: 0 0 auto;
+            width: 66.66666667%;
+        }
+        .col-4 {
+            flex: 0 0 auto;
+            width: 33.33333333%;
+        }
         .d-none {
             display: none;
         }
@@ -322,17 +441,17 @@ class VorsorgeList extends HTMLElement {
     `;
   }
 
-  render() {
-    this.root.innerHTML = `
+  private render(): string {
+    return `
       ${this.getStyle()}
-      <div class="${this.class}">
+      <div class="list-base">
         <div class="row">
           <div class="form-switch inflation-switch">
-            <input type="checkbox" name="vorsorgevorhanden" id="vorsorgevorhanden" class="form-check-input js-pensions-available" aria-describedby="askHelpBlock"${this.pensionExsists ? ' checked' : ''}>                                
-            <label class="form-check-label ms-2 optional" for="vorsorgevorhanden">Besteht bereits eine Vorsorge?</label>  
+            <input type="checkbox" name="vorsorgevorhanden" id="vorsorgevorhanden" class="form-check-input js-pensions-available" aria-describedby="askHelpBlock"${this.pensionExsists ? ' checked' : ''}>
+            <label class="form-check-label ms-2 optional" for="vorsorgevorhanden">Besteht bereits eine Vorsorge?</label>
             <div id="askHelpBlock" class="form-text">
               Bereits bestehende Altersvorsorgeverträge verringern Ihre Rentenlücke.
-            </div>                          
+            </div>
           </div>
         </div>
         <div class="pensions-available added-pension-wrapper my-4 d-none">
@@ -343,7 +462,7 @@ class VorsorgeList extends HTMLElement {
             </tbody>
             <tfoot class="js-no-pensions-rows-available added-pension-content d-none">
               <tr class="added-pension-item row row-nowrap">
-                <td colspan="3">Es wurden noch keine Vorsorgen eingegeben</td>
+                <td colspan="2">Es wurden noch keine Vorsorgen eingegeben</td>
               </tr>
             </tfoot>
           </table>
@@ -355,86 +474,26 @@ class VorsorgeList extends HTMLElement {
           </legend>
           <div class="row row-nowrap">
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="vorsorgeart" id="vorsorgeart_betrieblich" value="betrieblich" v-model="data.vorsorgeArt">
+              <input class="form-check-input" type="radio" name="vorsorgeart" id="vorsorgeart_betrieblich" value="betrieblich">
               <label class="form-check-label" for="vorsorgeart_betrieblich">betrieblich</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="vorsorgeart" id="vorsorgeart_privat" value="privat" v-model="data.vorsorgeArt">
+              <input class="form-check-input" type="radio" name="vorsorgeart" id="vorsorgeart_privat" value="privat">
               <label class="form-check-label" for="vorsorgeart_privat">privat</label>
             </div>
           </div>
           <div class="js-pension-amount form-floating">
-            <input type="number" name="vorsorgebetrag" id="vorsorgebetrag" class="form-control" placeholder=" " aria-label="Höhe der monatlichen Rente aus dieser Vorsorge in Euro" min="1" value="" required>                            
-            <label class="col-form-label" for="vorsorgebetrag">Höhe der monatlichen Rente aus dieser Vorsorge</label> 
+            <input type="number" name="vorsorgebetrag" id="vorsorgebetrag" class="form-control" placeholder=" " aria-label="Höhe der monatlichen Rente aus dieser Vorsorge in Euro" min="1" value="" required>
+            <label class="col-form-label" for="vorsorgebetrag">Höhe der monatlichen Rente aus dieser Vorsorge</label>
             <div class="invalid-feedback">Bitte geben Sie Ihr Nettogehalt an</div>
-            <div class="invalid-min-feedback">Der Wert muss größer 0 sein.</div>                       
+            <div class="invalid-min-feedback">Der Wert muss größer 0 sein.</div>
           </div>
         </fieldset>
         <div class="pensions-available text-start d-none button-box">
-          <button class="btn btn-sm btn-outline-primary">Vorsorge hinzufügen</button>
+          <button class="btn btn-sm btn-outline-primary js-add-button">Vorsorge hinzufügen</button>
         </div>
       </div>
     `;
-
-    const pensionsAvailableFields = this.root.querySelectorAll<HTMLInputElement>('.js-pensions-available');
-    const pensionsFields = this.root.querySelectorAll<HTMLInputElement>('.pensions-available');
-    const pensionsAvailableRows = this.root.querySelectorAll<HTMLTableSectionElement>('.js-pensions-rows-available');
-    const noPensionsAvailableRows = this.root.querySelectorAll<HTMLTableSectionElement>('.js-no-pensions-rows-available');
-
-    pensionsAvailableFields.forEach(field => {
-      field.addEventListener('change', event => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.pensionExsists = field.checked;
-
-        if (field.checked) {
-          pensionsFields.forEach(pensionsField => {
-            pensionsField.classList.remove('d-none');
-          });
-        } else {
-          pensionsFields.forEach(pensionsField => {
-            pensionsField.classList.add('d-none');
-          });
-          noPensionsAvailableRows.forEach(row => {
-            row.classList.remove('d-none');
-          });
-          pensionsAvailableRows.forEach(row => {
-            row.classList.add('d-none');
-          });
-
-          this.pensions = [];
-
-          const pensionsRows = this.root.querySelectorAll<HTMLTableSectionElement>('.js-pensions-rows-available tr');
-
-          pensionsRows.forEach(row => {
-            row.remove();
-          });
-        }
-      });
-    });
-
-    pensionsAvailableRows.forEach(row => {
-      if (this.pensions.length) {
-        row.classList.remove('d-none');
-      } else {
-        row.classList.add('d-none');
-      }
-    });
-    noPensionsAvailableRows.forEach(row => {
-      if (this.pensions.length) {
-        row.classList.add('d-none');
-      } else {
-        row.classList.remove('d-none');
-      }
-    });
-    pensionsFields.forEach(pensionsField => {
-      if (this.pensionExsists) {
-        pensionsField.classList.remove('d-none');
-      } else {
-        pensionsField.classList.add('d-none');
-      }
-    });
   }
 }
 

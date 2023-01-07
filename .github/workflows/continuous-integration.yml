@@ -10,22 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  ci:
-    name: "Run CI"
-
-    uses: "./.github/workflows/ci.yml"
-    with:
-      extensions: ""
-      ini-values: "opcache.enable=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
-      composer-options: "--optimize-autoloader --prefer-dist --prefer-stable -v"
-      composer-outdated-option: ""
-    secrets:
-      envPAT: "${{ secrets.GITHUB_TOKEN }}"
-
   tests:
     name: "UnitTests with PHPUnit"
-
-    needs: "ci"
 
     runs-on: "${{ matrix.operating-system }}"
     timeout-minutes: 10

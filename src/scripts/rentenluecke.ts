@@ -4,6 +4,7 @@ import * as CONFIG from './calc.config';
 import BruttoCalculation from './brutto-calc.2021';
 import BaseCalculation from './base-calc.2021';
 import KstCalculation from './kst-calc.2021';
+import {escapeHtml} from "./base";
 
 export default class Rentenluecke {
     public static setRateVal(setChecked: boolean): string {
@@ -238,7 +239,7 @@ export function setRateVal(event: Event) {
         rateVal = inflationRate.value;
     }
 
-    inflationValText.innerHTML = rateVal;
+    inflationValText.innerHTML = escapeHtml(rateVal);
 
     const forms = document.querySelectorAll<HTMLFormElement>('#renten-form');
 

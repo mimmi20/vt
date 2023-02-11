@@ -233,13 +233,13 @@ export function setRateVal(event: Event) {
     const inflationValTexts = document.querySelectorAll<HTMLSpanElement>('.js-inflation-rate');
     const inflationValText  = inflationValTexts[0];
 
-    let rateVal = '0.0';
+    let rateVal = Number(0.0);
 
     if (event.target.checked) {
-        rateVal = inflationRate.value;
+        rateVal = Number(inflationRate.value);
     }
 
-    inflationValText.innerHTML = escapeHtml(rateVal);
+    inflationValText.innerHTML = escapeHtml(rateVal.toString(10));
 
     const forms = document.querySelectorAll<HTMLFormElement>('#renten-form');
 

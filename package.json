@@ -16,7 +16,7 @@
     "vite-plugin-stylelint": "^4.3.0"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.6",
+    "@popperjs/core": "^2.11.7",
     "chart.js": "^4.2.1"
   }
 }

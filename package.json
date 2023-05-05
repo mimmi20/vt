@@ -10,9 +10,9 @@
   },
   "devDependencies": {
     "sass": "^1.62.1",
-    "stylelint": "^15.6.0",
+    "stylelint": "^15.6.1",
     "typescript": "^5.0.4",
-    "vite": "^4.3.3",
+    "vite": "^4.3.4",
     "vite-plugin-stylelint": "^4.3.0"
   },
   "dependencies": {

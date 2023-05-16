@@ -16,7 +16,7 @@
     "sass": "^1.62.1",
     "stylelint": "^15.6.1",
     "typescript": "^5.0.4",
-    "vite": "^4.3.5",
+    "vite": "^4.3.6",
     "vite-plugin-stylelint": "^4.3.0",
     "vitest": "^0.31.0"
   },

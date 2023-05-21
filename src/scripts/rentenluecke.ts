@@ -8,8 +8,8 @@ import {escapeHtml} from "./base";
 
 export default class Rentenluecke {
     public static setRateVal(setChecked: boolean): string {
-        const inflationRate = document.querySelectorAll<HTMLElement>('#inflationsrate'),
-            inflationActiv = document.querySelectorAll<HTMLElement>('#inflationAn');
+        const inflationRate: NodeListOf<HTMLElement> = document.querySelectorAll<HTMLElement>('#inflationsrate'),
+            inflationActiv: NodeListOf<HTMLElement> = document.querySelectorAll<HTMLElement>('#inflationAn');
 
         let rateVal = '0.0';
 
@@ -32,24 +32,24 @@ export default class Rentenluecke {
     }
 
     public static handleSlider(el: HTMLInputElement): void {
-        const tooltips = document.querySelectorAll<HTMLDivElement>('.js-slider-tooltip');
+        const tooltips: NodeListOf<HTMLDivElement> = document.querySelectorAll<HTMLDivElement>('.js-slider-tooltip');
 
         if (tooltips.length === 0) {
             return;
         }
 
-        const sliderValue = parseFloat(el.value),
-            sliderMax = parseFloat(el.max),
-            sliderMin = parseFloat(el.min);
+        const sliderValue: number = parseFloat(el.value),
+            sliderMax: number = parseFloat(el.max),
+            sliderMin: number = parseFloat(el.min);
 
         if (isNaN(sliderValue)) {
             el.value = '0';
         }
 
-        const tooltip = tooltips[0],
-            value = ((sliderValue - sliderMin) * 100) / (sliderMax - sliderMin),
-            percentOfRange = isNaN(value) ? 0 : value,
-            newPosition = -18 - (15 * percentOfRange) / 100;
+        const tooltip: HTMLDivElement = tooltips[0],
+            value: number = ((sliderValue - sliderMin) * 100) / (sliderMax - sliderMin),
+            percentOfRange: number = isNaN(value) ? 0 : value,
+            newPosition: number = -18 - (15 * percentOfRange) / 100;
 
         tooltip.innerHTML = '<span>' + sliderValue.toFixed(1) + '%' + '</span>';
         tooltip.style.left = `calc(${percentOfRange}% + (${newPosition}px))`;
@@ -70,13 +70,13 @@ export default class Rentenluecke {
         pvz: boolean,
         r: number,
         zkf: number
-    ) {
+    ): {valid: boolean, monatsBedarf: number, monatsRente: number, nettoRente: number, kv: number, steuer: number} {
         /* Variables */
 
-        const wunschBrutto = netto * anzahl,
-            monatsBedarf = netto * 0.8,
-            anzahlJahre = rente - alterBerufseinstieg,
-            einzahlDauer = rente - new Date().getFullYear() + geburtsjahr,
+        const wunschBrutto: number = netto * anzahl,
+            monatsBedarf: number = netto * 0.8,
+            anzahlJahre: number = rente - alterBerufseinstieg,
+            einzahlDauer: number = rente - new Date().getFullYear() + geburtsjahr,
             bruttoCalc = new BruttoCalculation();
 
         // calculation
@@ -116,8 +116,8 @@ export default class Rentenluecke {
             rentenwert *= Math.pow(1 + CONFIG.RENTEN_FAKTOR_BEREINIGUNG, einzahlDauer);
         }
 
-        const entgeltpunkte = anzahlJahre * jahresEntgeltpunkte;
-        const alterDiff = regelaltersgrenze - rente;
+        const entgeltpunkte: number = anzahlJahre * jahresEntgeltpunkte;
+        const alterDiff: number = regelaltersgrenze - rente;
 
         if (alterDiff === 0) {
             zugangsfaktor = 1;
@@ -143,8 +143,8 @@ export default class Rentenluecke {
             };
         }
 
-        const monatsRente = entgeltpunkte * zugangsfaktor * rentenwert * CONFIG.RENTEN_TYP_FAKTOR;
-        const jahrRenteneintritt = geburtsjahr + rente;
+        const monatsRente: number = entgeltpunkte * zugangsfaktor * rentenwert * CONFIG.RENTEN_TYP_FAKTOR;
+        const jahrRenteneintritt: number = geburtsjahr + rente;
 
         if (jahrRenteneintritt >= 2040) {
             rentensteuerAnteil = 1;
@@ -166,12 +166,12 @@ export default class Rentenluecke {
 
         const baseCalc = new BaseCalculation(),
             kstCalc = new KstCalculation();
-        baseCalc.calculate(state, taxClass, monatsRente * 12 * rentensteuerAnteil, lzz, stTabelle, pvz, r, zkf);
+        baseCalc.calculate(taxClass, monatsRente * 12 * rentensteuerAnteil, lzz, stTabelle, pvz, r, zkf);
 
-        const steuer = baseCalc.getLstlzz() / 100 / 12,
-            kst = kstCalc.calculate(state, baseCalc.getBk()) / 12,
-            kv = monatsRente * CONFIG.KV_FAKTOR_RENTE;
-        let nettoRente = monatsRente - kv - steuer - kst;
+        const steuer: number = baseCalc.getLstlzz() / 100 / 12,
+            kst: number = kstCalc.calculate(state, baseCalc.getBk()) / 12,
+            kv: number = monatsRente * CONFIG.KV_FAKTOR_RENTE;
+        let nettoRente: number = monatsRente - kv - steuer - kst;
 
         if (inflationAn && inflationsrate > 0.0) {
             nettoRente *= Math.pow(1 + inflationsrate / 100, -1 * einzahlDauer);
@@ -222,16 +222,16 @@ export default class Rentenluecke {
     }
 }
 
-export function setRateVal(event: Event) {
+export function setRateVal(event: Event): void {
     if (null === event.target || !(event.target instanceof HTMLInputElement)) {
         return;
     }
 
-    const inflationRates = document.querySelectorAll<HTMLInputElement>('#inflationsrate');
-    const inflationRate  = inflationRates[0];
+    const inflationRates: NodeListOf<HTMLInputElement> = document.querySelectorAll<HTMLInputElement>('#inflationsrate');
+    const inflationRate: HTMLInputElement  = inflationRates[0];
 
-    const inflationValTexts = document.querySelectorAll<HTMLSpanElement>('.js-inflation-rate');
-    const inflationValText  = inflationValTexts[0];
+    const inflationValTexts: NodeListOf<HTMLSpanElement> = document.querySelectorAll<HTMLSpanElement>('.js-inflation-rate');
+    const inflationValText: HTMLSpanElement  = inflationValTexts[0];
 
     let rateVal = Number(0.0);
 
@@ -241,9 +241,9 @@ export function setRateVal(event: Event) {
 
     inflationValText.innerHTML = escapeHtml(rateVal.toString(10));
 
-    const forms = document.querySelectorAll<HTMLFormElement>('#renten-form');
+    const forms: NodeListOf<HTMLFormElement> = document.querySelectorAll<HTMLFormElement>('#renten-form');
 
-    forms.forEach(function (el) {
+    forms.forEach(function (el: HTMLFormElement) {
         el.dispatchEvent(
             new SubmitEvent('submit', {
                 bubbles: true, // Whether the event will bubble up through the DOM or not
@@ -253,20 +253,20 @@ export function setRateVal(event: Event) {
     });
 }
 
-export function slider() {
-    const sliders = document.querySelectorAll<HTMLInputElement>('.js-tooltip-slider');
+export function slider(): void {
+    const sliders: NodeListOf<HTMLInputElement> = document.querySelectorAll<HTMLInputElement>('.js-tooltip-slider');
 
-    sliders.forEach((slider) => {
+    sliders.forEach((slider: HTMLInputElement) => {
         Rentenluecke.handleSlider(slider);
     });
 }
 
-export function showModal(event: Event) {
+export function showModal(event: Event): void {
     if (null === event.target || !(event.target instanceof HTMLAnchorElement)) {
         return;
     }
 
-    const favDialog = document.getElementById('inflation-layer');
+    const favDialog: HTMLElement|null = document.getElementById('inflation-layer');
 
     if (!(favDialog instanceof HTMLDialogElement)) {
         return;
@@ -276,8 +276,8 @@ export function showModal(event: Event) {
     favDialog.showModal();
 }
 
-export function hideModal() {
-    const favDialog = document.getElementById('inflation-layer');
+export function hideModal(): void {
+    const favDialog: HTMLElement|null = document.getElementById('inflation-layer');
 
     if (!(favDialog instanceof HTMLDialogElement)) {
         return;

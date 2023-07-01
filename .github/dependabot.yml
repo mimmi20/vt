@@ -3,26 +3,26 @@
 version: 2
 
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "04:00"
-      timezone: "Europe/Berlin"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
-    assignees:
-      - "mimmi20"
-    labels:
-      - "dependencies"
-      - "patch"
-    versioning-strategy: "increase"
-    target-branch: "master"
-    commit-message:
-      include: "scope"
-      prefix: "npm"
+#  - package-ecosystem: "npm"
+#    directory: "/"
+#    schedule:
+#      interval: "weekly"
+#      day: "sunday"
+#      time: "04:00"
+#      timezone: "Europe/Berlin"
+#    open-pull-requests-limit: 10
+#    reviewers:
+#      - "mimmi20"
+#    assignees:
+#      - "mimmi20"
+#    labels:
+#      - "dependencies"
+#      - "patch"
+#    versioning-strategy: "increase"
+#    target-branch: "master"
+#    commit-message:
+#      include: "scope"
+#      prefix: "npm"
 #    ignore:
 #      - dependency-name: infection/infection
 #        versions:

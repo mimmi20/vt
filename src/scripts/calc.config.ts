@@ -1,15 +1,15 @@
-export const BBGKVPV = 58050;
-export const BBGRV_OST = 80400;
-export const BBGRV_WEST = 85200;
-export const GFB = 9744;
+export const BBGKVPV = 59850;
+export const BBGRV_OST = 85200;
+export const BBGRV_WEST = 87600;
+export const GFB = 10908;
 export const KVSATZAG = 0.0065 + 0.07;
-export const KVZ = 1.3;
+export const KVZ = 1.60;
 export const RVSATZAN = 0.093;
-export const SOLZFREI = 16956;
+export const SOLZFREI = 17543;
 export const TBSVORV = 0.84;
-export const W1STKL5 = 11237;
-export const W2STKL5 = 28959;
-export const W3STKL5 = 219690;
+export const W1STKL5 = 12485;
+export const W2STKL5 = 31404;
+export const W3STKL5 = 222260;
 
 /**
  * Anteil vom Brutto, der für die Krankenversicherung abgezogen wird

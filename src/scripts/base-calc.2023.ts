@@ -1414,7 +1414,7 @@ export default class BaseCalculation {
 
     const lstjahr: number = st * this.f;
 
-    console.log(this.stkl, this.re4, this.lzz, this.krv, this.pvz, st, this.f);
+    //console.log(this.stkl, this.re4, this.lzz, this.krv, this.pvz, this.r, this.kvz, this.zkf, this.pkv, this.pvs, this.af, this.bk, this.bks, this.bkv, st, this.f);
 
     // Ermittlung des Anteils der Jahreslohnsteuer für den Lohnzahlungszeitraum
     this.lstlzz = this.floor(this.UPLSTLZZ(lstjahr));

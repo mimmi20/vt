@@ -3,31 +3,16 @@ import BaseCalculation from '../../src/scripts/base-calc.2023';
 
 const tests = [];
 
-// for (let income: number = 5000; income < 15005; ) {
-//   // for (let taxgroup: number = 1; taxgroup < 2; taxgroup++) {
-//   //   const taxTests = require ('../fixture-data/base-calc_' + income + '_' + taxgroup + '.json');
-//   //
-//   //   taxTests.forEach(function(test): void {
-//   //     tests.push(test);
-//   //   })
-//   // }
-//
-//   const taxgroup = 1;
-//   const taxTests = require ('../fixture-data/base-calc_' + income + '_' + taxgroup + '.json');
-//
-//   taxTests.forEach(function(test): void {
-//     tests.push(test);
-//   })
-//   income += 5000;
-// }
+for (let income: number = 5000; income < 15005; ) {
+  for (let taxgroup: number = 1; taxgroup < 2; taxgroup++) {
+    const taxTests = require ('../fixture-data/base-calc_' + income + '_' + taxgroup + '.json');
 
-const income = 15000;
-const taxgroup = 1;
-const taxTests = require ('../fixture-data/base-calc_' + income + '_' + taxgroup + '.json');
-
-taxTests.forEach(function(test): void {
-  tests.push(test);
-})
+    taxTests.forEach(function(test): void {
+      tests.push(test);
+    })
+  }
+  income += 5000;
+}
 
 describe('base-calc', (): void => {
   it.todo('unimplemented test');
@@ -40,80 +25,80 @@ describe('base-calc', (): void => {
       re4,
       lzz,
       krv,
-      pvz,
+      pvz === 1,
       r,
       kvz,
       zkf,
       pkv,
-      pvs,
-      af
+      pvs === 1,
+      af === 1
     );
 
-    test(`calculate lstlzz for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate lstlzz for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getLstlzz()).toBe(lstlzz);
     })
 
-    test(`calculate solzlzz for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate solzlzz for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getSolzlzz()).toBe(solzlzz);
     })
 
-    test(`calculate bk for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate bk for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getBk()).toBe(bk);
     })
 
-    test(`calculate bks for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate bks for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getBks()).toBe(bks);
     })
 
-    test(`calculate bkv for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate bkv for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getBkv()).toBe(bkv);
     })
 
-    test(`calculate solzs for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate solzs for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getSolzs()).toBe(solzs);
     })
 
-    test(`calculate solzv for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate solzv for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getSolzv()).toBe(solzv);
     })
 
-    test(`calculate sts for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate sts for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getSts()).toBe(sts);
     })
 
-    test(`calculate stv for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate stv for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getStv()).toBe(stv);
     })
 
-    test(`calculate vkvlzz for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate vkvlzz for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getVkvlzz()).toBe(vkvlzz);
     })
 
-    test(`calculate vkvsonst for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate vkvsonst for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getVkvsonst()).toBe(vkvsonst);
     })
 
-    test(`calculate vfrb for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate vfrb for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getVfrb()).toBe(vfrb);
     })
 
-    test(`calculate vfrbs1 for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate vfrbs1 for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getVfrbs1()).toBe(vfrbs1);
     })
 
-    test(`calculate vfrbs2 for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate vfrbs2 for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getVfrbs2()).toBe(vfrbs2);
     })
 
-    test(`calculate wvfrb for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate wvfrb for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getWvfrb()).toBe(wvfrb);
     })
 
-    test(`calculate wvfrbo for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate wvfrbo for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getWvfrbo()).toBe(wvfrbo);
     })
 
-    test(`calculate wvfrbm for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}`, () => {
+    test(`calculate wvfrbm for tax class ${stkl}, income ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, () => {
       expect(baseCalc.getWvfrbm()).toBe(wvfrbm);
     })
   });

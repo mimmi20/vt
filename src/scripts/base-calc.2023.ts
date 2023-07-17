@@ -1414,7 +1414,7 @@ export default class BaseCalculation {
 
     const lstjahr: number = st * this.f;
 
-    //console.log(this.stkl, this.re4, this.lzz, this.krv, this.pvz, this.r, this.kvz, this.zkf, this.pkv, this.pvs, this.af, this.bk, this.bks, this.bkv, st, this.f);
+    //console.log('::MBERECH::', this.stkl, this.re4, this.lzz, this.krv, this.pvz, this.r, this.kvz, this.zkf, this.pkv, this.pvs, this.af, this.bk, this.bks, this.bkv, st, this.f, this.wvfrb);
 
     // Ermittlung des Anteils der Jahreslohnsteuer für den Lohnzahlungszeitraum
     this.lstlzz = this.floor(this.UPLSTLZZ(lstjahr));
@@ -1506,6 +1506,8 @@ export default class BaseCalculation {
   private MLSTJAHR(): number {
     const vsp = this.UPEVP();
 
+    //console.log('::MLSTJAHR::', vsp, this.KENNVMT_MT !== this.kennvmt);
+
     if (this.KENNVMT_MT !== this.kennvmt) {
       this.zve = this.zre4 - this.ztabfb - vsp;
 
@@ -1540,12 +1542,16 @@ export default class BaseCalculation {
   private UPEVP(): number {
     let vsp1: number = 0.0;
 
+    //console.log('::UPEVP::1::', vsp1, this.KRV_SONST !== this.krv);
+
     if (this.KRV_SONST !== this.krv) {
+      //console.log('::UPEVP::2::', this.zre4vp > this.bbgrv);
       if (this.zre4vp > this.bbgrv) {
         this.zre4vp = this.bbgrv;
       }
 
       vsp1 = this.tbsvorv * this.zre4vp * this.rvsatzan;
+      //console.log('::UPEVP::3::', this.tbsvorv, this.zre4vp, this.rvsatzan, this.tbsvorv * this.zre4vp * this.rvsatzan);
     }
 
     this.vsp2 = 0.12 * this.zre4vp;

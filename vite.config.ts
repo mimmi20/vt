@@ -8,7 +8,7 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       enabled: true,
-      reporter: ['clover', 'text', 'html'],
+      reporter: ['text', 'html', 'lcov'],
       reportsDirectory: '.reports',
       include: ['src'],
     },

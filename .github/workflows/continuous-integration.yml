@@ -59,7 +59,7 @@ jobs:
         uses: "codecov/codecov-action@v3.1.1"
         with:
           fail_ci_if_error: true
-          file: ".reports/clover.xml"
+          #file: ".reports/clover.xml"
           flags: "vitest,nodejs-${{ matrix.node-version }},${{ matrix.operating-system }}"
           verbose: false
 

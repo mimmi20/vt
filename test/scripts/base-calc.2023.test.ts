@@ -3,7 +3,7 @@ import BaseCalculation from '../../src/scripts/base-calc.2023';
 
 const tests = [];
 
-for (let income: number = 5000; income < 15005; ) {
+for (let income: number = 5000; income < 90000; ) {
   for (let taxgroup: number = 1; taxgroup < 2; taxgroup++) {
     const taxTests = require ('../fixture-data/base-calc_' + income + '_' + taxgroup + '.json');
 

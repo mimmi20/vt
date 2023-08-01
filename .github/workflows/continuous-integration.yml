@@ -56,7 +56,7 @@ jobs:
         run: "npm run coverage"
 
       - name: "Upload coverage to Codecov"
-        uses: "codecov/codecov-action@v3.1.1"
+        uses: "codecov/codecov-action@v3.1.4"
         with:
           fail_ci_if_error: true
           file: ".reports/clover.xml"

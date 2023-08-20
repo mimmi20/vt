@@ -24,8 +24,8 @@ updates:
         patterns:
           - "*"
         update-types:
-          - "minor"
           - "patch"
+          - "minor"
         # exclude-patterns:
         #   - "gc_ruboconfig"
 
@@ -49,16 +49,16 @@ updates:
       include: "scope"
       prefix: "npm"
 
-    # ignore:
-    #   - dependency-name: infection/infection
-    #     versions:
-    #       - ">= 0"
-    #   - dependency-name: phpunit/phpunit
-    #     versions:
-    #       - ">= 0"
-    #   - dependency-name: phpunit/phpunit
-    #     versions:
-    #       - ">= 0"
+    ignore:
+       - dependency-name: "@vitest/coverage-istanbul"
+         versions:
+           - ">= 0.34.2"
+       - dependency-name: "vitest"
+         versions:
+           - ">= 0.34.2"
+       - dependency-name: "supports-color"
+         versions:
+           - ">= 8.0.0"
 
   - package-ecosystem: "github-actions"
 
@@ -79,8 +79,8 @@ updates:
         patterns:
           - "*"
         update-types:
-          - "minor"
           - "patch"
+          - "minor"
         # exclude-patterns:
         #   - "gc_ruboconfig"
 

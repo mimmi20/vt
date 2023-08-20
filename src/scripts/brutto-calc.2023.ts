@@ -1,8 +1,9 @@
 import * as CONFIG from './calc.config';
 import * as LZZ from './lzz';
 import * as KRV from './krv-table';
+import * as STATES from './states';
 import BaseCalculation from './base-calc.2023';
-import KstCalculation from './kst-calc.2021';
+import KstCalculation from './kst-calc.2023';
 
 export default class BruttoCalculation {
     private baseCalc: BaseCalculation;
@@ -56,10 +57,16 @@ export default class BruttoCalculation {
             pvsatzan: number,
             bbgkvpv: number,
             kvz: number,
-            minbrutto = 0;
+            minbrutto: number = 0,
+            pvs: number = 0,
+            pkv: number = this.baseCalc.PKV_GES;
+
+        if (state === STATES.BUNDESLAND_SN) {
+          pvs = 1;
+        }
 
         do {
-            this.baseCalc.calculate(taxClass, brutto, lzz, stTabelle, pvz, r, zkf);
+            this.baseCalc.calculate(taxClass, brutto, lzz, stTabelle, pvz, r, zkf, pkv, pvs);
 
             lst = this.baseCalc.getLstlzz() / 100;
             solz = this.baseCalc.getSolzlzz() / 100;

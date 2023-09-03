@@ -1,7 +1,7 @@
 import * as CONFIG from './calc.config';
 import * as LZZ from './lzz';
 import * as KRV from './krv-table';
-import BaseCalculation from './base-calc.2021';
+import BaseCalculation from './base-calc.2023';
 import KstCalculation from './kst-calc.2021';
 
 export default class BruttoCalculation {

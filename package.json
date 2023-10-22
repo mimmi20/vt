@@ -14,7 +14,7 @@
   "devDependencies": {
     "@vitest/coverage-istanbul": "0.34.1",
     "sass": "^1.68.0",
-    "stylelint": "^15.10.3",
+    "stylelint": "^15.11.0",
     "stylelint-config-standard": "^34.0.0",
     "supports-color": "^7.2.0",
     "typescript": "^5.2.2",

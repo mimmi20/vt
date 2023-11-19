@@ -1,44 +1,13 @@
 import { describe, it, expect, test } from 'vitest'
 import BaseCalculation from '../../src/scripts/base-calc.2023';
 
-const tests = [
-  // {
-  //   "stkl": 1,
-  //   "re4": 8500000,
-  //   "lzz": 1,
-  //   "krv": 1,
-  //   "pvz": 0,
-  //   "r": 1,
-  //   "kvz": 1.6,
-  //   "zkf": 0,
-  //   "pkv": 0,
-  //   "pvs": 1,
-  //   "af": 0,
-  //   "bk": 1941700,
-  //   "bks": 0,
-  //   "bkv": 0,
-  //   "lstlzz": 1941700,
-  //   "solzlzz": 22300,
-  //   "solzs": 0,
-  //   "solzv": 0,
-  //   "sts": 0,
-  //   "stv": 0,
-  //   "vkvlzz": 0,
-  //   "vkvsonst": 0,
-  //   "vfrb": 120000,
-  //   "vfrbs1": 0,
-  //   "vfrbs2": 0,
-  //   "wvfrb": 5907000,
-  //   "wvfrbo": 0,
-  //   "wvfrbm": 0
-  // }
-];
+const tests: Object[] = [];
 
 for (let re4: number = 5000; re4 <= 90000; ) {
   for (let stkl: number = 1; stkl < 2; stkl++) {
     const taxTests = require ('../fixture-data/base-calc_' + re4 + '_' + stkl + '.json');
 
-    taxTests.forEach(function(test): void {
+    taxTests.forEach(function(test: Object): void {
       tests.push(test);
     })
   }

@@ -1,8 +1,14 @@
 import { defineConfig } from 'vitest/config';
 import * as path from 'path';
+import stylelint from 'vite-plugin-stylelint';
+import eslint from 'vite-plugin-eslint';
 
 export default defineConfig({
   root: __dirname,
+  plugins: [
+    stylelint(),
+    eslint(),
+  ],
   build: {
     manifest: true,
   },

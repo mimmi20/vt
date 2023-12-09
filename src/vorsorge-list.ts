@@ -1,154 +1,154 @@
-
 class VorsorgeList extends HTMLElement {
-  private root: ShadowRoot;
-  private pensions:Array<{ id: number; amount: number; type: string; }> = [];
-  private pensionExsists: boolean = false;
+    private root: ShadowRoot;
+    private pensions: Array<{ id: number; amount: number; type: string }> = [];
+    private pensionExsists = false;
 
-  constructor() {
-    super();
+    constructor() {
+        super();
 
-    this.root = this.attachShadow({mode: 'closed'});
-  }
+        this.root = this.attachShadow({ mode: 'closed' });
+    }
 
-  connectedCallback() {
-    this.root.innerHTML = this.render();
+    connectedCallback() {
+        this.root.innerHTML = this.render();
 
-    const pensionsAvailableFields = this.root.querySelectorAll<HTMLInputElement>('.js-pensions-available');
-    const pensionsFields = this.root.querySelectorAll<HTMLInputElement>('.pensions-available');
-    const addButtons = this.root.querySelectorAll<HTMLTableSectionElement>('.js-add-button');
+        const pensionsAvailableFields = this.root.querySelectorAll<HTMLInputElement>('.js-pensions-available');
+        const pensionsFields = this.root.querySelectorAll<HTMLInputElement>('.pensions-available');
+        const addButtons = this.root.querySelectorAll<HTMLTableSectionElement>('.js-add-button');
 
-    pensionsAvailableFields.forEach(field => {
-      field.addEventListener('change', event => {
-        event.preventDefault();
-        event.stopPropagation();
+        pensionsAvailableFields.forEach((field) => {
+            field.addEventListener('change', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
 
-        this.pensionExsists = field.checked;
+                this.pensionExsists = field.checked;
 
-        if (field.checked) {
-          pensionsFields.forEach(pensionsField => {
-            pensionsField.classList.remove('d-none');
-          });
-        } else {
-          pensionsFields.forEach(pensionsField => {
-            pensionsField.classList.add('d-none');
-          });
+                if (field.checked) {
+                    pensionsFields.forEach((pensionsField) => {
+                        pensionsField.classList.remove('d-none');
+                    });
+                } else {
+                    pensionsFields.forEach((pensionsField) => {
+                        pensionsField.classList.add('d-none');
+                    });
 
-          this.pensions = [];
+                    this.pensions = [];
 
-          this.renderTable();
-        }
-      });
-    });
-    pensionsFields.forEach(pensionsField => {
-      if (this.pensionExsists) {
-        pensionsField.classList.remove('d-none');
-      } else {
-        pensionsField.classList.add('d-none');
-      }
-    });
-    addButtons.forEach(addButton => {
-      addButton.addEventListener('click', () => {
-        const vorsorgeart = this.root.querySelectorAll<HTMLInputElement>('[name="vorsorgeart"]:checked');
-        const vorsorgebetrag = this.root.querySelectorAll<HTMLInputElement>('[name="vorsorgebetrag"]');
+                    this.renderTable();
+                }
+            });
+        });
+        pensionsFields.forEach((pensionsField) => {
+            if (this.pensionExsists) {
+                pensionsField.classList.remove('d-none');
+            } else {
+                pensionsField.classList.add('d-none');
+            }
+        });
+        addButtons.forEach((addButton) => {
+            addButton.addEventListener(
+                'click',
+                () => {
+                    const vorsorgeart = this.root.querySelectorAll<HTMLInputElement>('[name="vorsorgeart"]:checked');
+                    const vorsorgebetrag = this.root.querySelectorAll<HTMLInputElement>('[name="vorsorgebetrag"]');
 
-        if (vorsorgeart.length === 0 || vorsorgebetrag.length === 0) {
-          return;
-        }
+                    if (vorsorgeart.length === 0 || vorsorgebetrag.length === 0) {
+                        return;
+                    }
 
-        this.pensions.push({id: this.pensions.length, amount: parseInt(vorsorgebetrag[0].value, 10), type: vorsorgeart[0].value});
+                    this.pensions.push({ id: this.pensions.length, amount: parseInt(vorsorgebetrag[0].value, 10), type: vorsorgeart[0].value });
+
+                    this.renderTable();
+
+                    let summaryPension = 0;
+
+                    this.pensions.forEach((pension) => {
+                        summaryPension += pension.amount;
+                    });
+
+                    this.dispatchEvent(
+                        new CustomEvent<PensionInfo>('pension.added', {
+                            detail: {
+                                summary: summaryPension,
+                                bubbles: true, // Whether the event will bubble up through the DOM or not
+                                cancelable: false, // Whether the event may be canceled or not
+                            },
+                        }),
+                    );
+                },
+                false,
+            );
+        });
 
         this.renderTable();
+    }
 
-        let summaryPension = 0;
+    attributeChangedCallback(attrName: string, oldVal: string | null, newVal: string | null) {
+        if ('class' === attrName) {
+            const bases = this.root.querySelectorAll<HTMLInputElement>('.list-base');
 
-        this.pensions.forEach(pension => {
-          summaryPension += pension.amount;
-        });
+            bases.forEach((base) => {
+                if (null !== oldVal) {
+                    base.classList.remove(oldVal);
+                }
 
-        this.dispatchEvent(
-          new CustomEvent(
-            'pension.added',
-            {
-              'detail': {
-                summary: summaryPension,
-                bubbles: true, // Whether the event will bubble up through the DOM or not
-                cancelable: false, // Whether the event may be canceled or not
-              }
+                if (null !== newVal) {
+                    base.classList.add(newVal);
+                }
+            });
+        }
+    }
+
+    diconnectedCallback() {
+        // nothing to do at the moment
+    }
+
+    static get observedAttributes(): Array<string> {
+        return ['class'];
+    }
+
+    get class(): string | null {
+        return this.getAttribute('class');
+    }
+
+    set class(classVal: string | null) {
+        if (classVal) {
+            this.setAttribute('class', classVal);
+        } else {
+            this.setAttribute('class', '');
+        }
+    }
+
+    private renderTable(): void {
+        const pensionsAvailable = this.root.querySelectorAll<HTMLTableSectionElement>('.js-pensions-rows-available');
+        const noPensionsAvailable = this.root.querySelectorAll<HTMLTableSectionElement>('.js-no-pensions-rows-available');
+
+        noPensionsAvailable.forEach((tfoot) => {
+            if (this.pensions.length) {
+                tfoot.classList.add('d-none');
+            } else {
+                tfoot.classList.remove('d-none');
             }
-          )
-        );
-      }, false);
-    });
-
-    this.renderTable();
-  }
-
-  attributeChangedCallback(attrName: string, oldVal: string|null, newVal: string|null) {
-    if ('class' === attrName) {
-      const bases = this.root.querySelectorAll<HTMLInputElement>('.list-base');
-
-      bases.forEach(base => {
-        if (null !== oldVal) {
-          base.classList.remove(oldVal);
-        }
-
-        if (null !== newVal) {
-          base.classList.add(newVal);
-        }
-      });
-    }
-  }
-
-  diconnectedCallback() {
-    // nothing to do at the moment
-  }
-
-  static get observedAttributes(): Array<string> {
-    return ['class'];
-  }
-
-  get class(): string|null {
-    return this.getAttribute('class');
-  }
-
-  set class(classVal: string|null) {
-    if (classVal) {
-      this.setAttribute('class', classVal);
-    } else {
-      this.setAttribute('class', '');
-    }
-  }
-
-  private renderTable(): void {
-    const pensionsAvailable = this.root.querySelectorAll<HTMLTableSectionElement>('.js-pensions-rows-available');
-    const noPensionsAvailable = this.root.querySelectorAll<HTMLTableSectionElement>('.js-no-pensions-rows-available');
-
-    noPensionsAvailable.forEach(tfoot => {
-      if (this.pensions.length) {
-        tfoot.classList.add('d-none');
-      } else {
-        tfoot.classList.remove('d-none');
-      }
-    });
-    pensionsAvailable.forEach(tbody => {
-      tbody.innerHTML = '';
-
-      if (this.pensions.length) {
-        tbody.classList.remove('d-none');
-
-        this.pensions.forEach(pension => {
-          tbody.innerHTML += `<tr class="added-pension-item row row-nowrap" data-id="${pension.id}"><td class="added-pension-type col-8 pe-0">${pension.type}</td><td class="added-pension-amount col-4 text-end position-relative">${new Intl.NumberFormat('de-DE', {style: 'currency', currency: 'EUR'}).format(pension.amount)}</td></tr>`;
         });
-      } else {
-        tbody.classList.add('d-none');
-      }
-    });
+        pensionsAvailable.forEach((tbody) => {
+            tbody.innerHTML = '';
 
+            if (this.pensions.length) {
+                tbody.classList.remove('d-none');
 
-  }
+                this.pensions.forEach((pension) => {
+                    tbody.innerHTML += `<tr class="added-pension-item row row-nowrap" data-id="${pension.id}"><td class="added-pension-type col-8 pe-0">${
+                        pension.type
+                    }</td><td class="added-pension-amount col-4 text-end position-relative">${new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(pension.amount)}</td></tr>`;
+                });
+            } else {
+                tbody.classList.add('d-none');
+            }
+        });
+    }
 
-  private getStyle(): string {
-    return `
+    private getStyle(): string {
+        return `
     <style>
         *,*::before,*::after {
             box-sizing: border-box
@@ -439,15 +439,17 @@ class VorsorgeList extends HTMLElement {
         }
     </style>
     `;
-  }
+    }
 
-  private render(): string {
-    return `
+    private render(): string {
+        return `
       ${this.getStyle()}
       <div class="list-base">
         <div class="row">
           <div class="form-switch inflation-switch">
-            <input type="checkbox" name="vorsorgevorhanden" id="vorsorgevorhanden" class="form-check-input js-pensions-available" aria-describedby="askHelpBlock"${this.pensionExsists ? ' checked' : ''}>
+            <input type="checkbox" name="vorsorgevorhanden" id="vorsorgevorhanden" class="form-check-input js-pensions-available" aria-describedby="askHelpBlock"${
+                this.pensionExsists ? ' checked' : ''
+            }>
             <label class="form-check-label ms-2 optional" for="vorsorgevorhanden">Besteht bereits eine Vorsorge?</label>
             <div id="askHelpBlock" class="form-text">
               Bereits bestehende Altersvorsorgeverträge verringern Ihre Rentenlücke.
@@ -494,7 +496,7 @@ class VorsorgeList extends HTMLElement {
         </div>
       </div>
     `;
-  }
+    }
 }
 
 export default VorsorgeList;

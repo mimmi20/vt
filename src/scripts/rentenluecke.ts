@@ -1,10 +1,9 @@
-
 import * as STATES from './states';
 import * as CONFIG from './calc.config';
 import BruttoCalculation from './brutto-calc.2021';
 import BaseCalculation from './base-calc.2023';
 import KstCalculation from './kst-calc.2021';
-import {escapeHtml} from "./base";
+import { escapeHtml } from './base';
 
 export default class Rentenluecke {
     public static setRateVal(setChecked: boolean): string {
@@ -69,8 +68,8 @@ export default class Rentenluecke {
         stTabelle: number,
         pvz: boolean,
         r: number,
-        zkf: number
-    ): {valid: boolean, monatsBedarf: number, monatsRente: number, nettoRente: number, kv: number, steuer: number} {
+        zkf: number,
+    ): { valid: boolean; monatsBedarf: number; monatsRente: number; nettoRente: number; kv: number; steuer: number } {
         /* Variables */
 
         const wunschBrutto: number = netto * anzahl,
@@ -108,7 +107,7 @@ export default class Rentenluecke {
                 monatsRente: 0,
                 nettoRente: 0,
                 kv: 0,
-                steuer: 0
+                steuer: 0,
             };
         }
 
@@ -139,7 +138,7 @@ export default class Rentenluecke {
                 monatsRente: 0,
                 nettoRente: 0,
                 kv: 0,
-                steuer: 0
+                steuer: 0,
             };
         }
 
@@ -160,7 +159,7 @@ export default class Rentenluecke {
                 monatsRente: 0,
                 nettoRente: 0,
                 kv: 0,
-                steuer: 0
+                steuer: 0,
             };
         }
 
@@ -228,10 +227,10 @@ export function setRateVal(event: Event): void {
     }
 
     const inflationRates: NodeListOf<HTMLInputElement> = document.querySelectorAll<HTMLInputElement>('#inflationsrate');
-    const inflationRate: HTMLInputElement  = inflationRates[0];
+    const inflationRate: HTMLInputElement = inflationRates[0];
 
     const inflationValTexts: NodeListOf<HTMLSpanElement> = document.querySelectorAll<HTMLSpanElement>('.js-inflation-rate');
-    const inflationValText: HTMLSpanElement  = inflationValTexts[0];
+    const inflationValText: HTMLSpanElement = inflationValTexts[0];
 
     let rateVal = Number(0.0);
 
@@ -248,7 +247,7 @@ export function setRateVal(event: Event): void {
             new SubmitEvent('submit', {
                 bubbles: true, // Whether the event will bubble up through the DOM or not
                 cancelable: true, // Whether the event may be canceled or not
-            })
+            }),
         );
     });
 }
@@ -266,7 +265,7 @@ export function showModal(event: Event): void {
         return;
     }
 
-    const favDialog: HTMLElement|null = document.getElementById('inflation-layer');
+    const favDialog: HTMLElement | null = document.getElementById('inflation-layer');
 
     if (!(favDialog instanceof HTMLDialogElement)) {
         return;
@@ -277,7 +276,7 @@ export function showModal(event: Event): void {
 }
 
 export function hideModal(): void {
-    const favDialog: HTMLElement|null = document.getElementById('inflation-layer');
+    const favDialog: HTMLElement | null = document.getElementById('inflation-layer');
 
     if (!(favDialog instanceof HTMLDialogElement)) {
         return;

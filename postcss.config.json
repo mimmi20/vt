@@ -1,0 +1,38 @@
+{
+  "map": false,
+  "plugins": {
+    "postcss-import": {},
+    "postcss-will-change": {},
+    "postcss-color-rgba-fallback": {},
+    "postcss-flexbugs-fixes": {},
+    "postcss-gradientfixer": {},
+    "postcss-flexboxfixer": {},
+    "postcss-input-style": {},
+    "postcss-preset-env": {
+      "stage": 2,
+      "features": {
+        "all-property": true,
+        "break-properties": true,
+        "clamp": true,
+        "custom-media-queries": true,
+        "custom-properties": true,
+        "custom-selectors": true,
+        "gap-properties": true,
+        "hexadecimal-alpha-notation": true,
+        "image-set-function": {"oninvalid": "warning"},
+        "is-pseudo-class": true,
+        "media-query-ranges": true,
+        "nested-calc": true,
+        "opacity-percentage": true,
+        "overflow-property": true,
+        "overflow-wrap-property": {"method": "copy"},
+        "rebeccapurple-color": true,
+        "system-ui-font-family": true,
+        "unset-value": true
+      },
+      "autoprefixer": { "grid": true },
+      "preserve": true
+    },
+    "cssnano": {"preset": "default", "safe": true, "calc": false}
+  }
+}

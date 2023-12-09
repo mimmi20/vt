@@ -9,7 +9,8 @@
     "preview": "tsc && vite preview",
     "test": "tsc && vitest run",
     "coverage": "tsc && vitest run --coverage",
-    "typecheck": "tsc && vitest typecheck"
+    "typecheck": "tsc && vitest typecheck",
+    "lint": "eslint . --ext .ts,.js"
   },
   "devDependencies": {
     "@csstools/postcss-cascade-layers": "^4.0.0",
@@ -25,12 +26,14 @@
     "@types/bootstrap": "^5.2.6",
     "@types/node": "^18.11.15",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
+    "@typescript-eslint/parser": "^5.62.0 || ^6.13.2",
     "@vitest/coverage-istanbul": "0.34.1",
     "autoprefixer": "^10.4.13",
     "browserslist": "^4.21.4",
     "cssnano": "^5.1.14 || ^6.0.1",
     "cssnano-preset-default": "^5.2.13",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
     "lilconfig": "^3.0.0",
     "postcss": "^8.4.31",

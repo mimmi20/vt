@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config';
 import * as path from 'path';
 
 export default defineConfig({
+  root: __dirname,
   build: {
     manifest: true,
   },
@@ -17,7 +18,7 @@ export default defineConfig({
     setupFiles: ['test/setup.ts'],
     clearMocks: true,
 
-    reporters: ['default', 'html', 'junit'],
+    reporters: ['default', 'junit'],
     outputFile: {
       junit: './junit-report.xml',
       html: './json-report.html',

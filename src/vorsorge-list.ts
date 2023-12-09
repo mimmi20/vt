@@ -66,7 +66,7 @@ class VorsorgeList extends HTMLElement {
         });
 
         this.dispatchEvent(
-          new CustomEvent(
+          new CustomEvent<PensionInfo>(
             'pension.added',
             {
               'detail': {

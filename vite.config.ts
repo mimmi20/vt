@@ -1,8 +1,15 @@
 import { defineConfig } from 'vitest/config';
 import * as path from 'path';
+import stylelint from 'vite-plugin-stylelint';
 
 export default defineConfig({
   root: __dirname,
+  plugins: [
+    stylelint({
+      // recommend to enable auto fix
+      fix: false,
+    }),
+  ],
   build: {
     manifest: true,
   },

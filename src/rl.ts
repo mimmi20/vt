@@ -30,14 +30,14 @@ class RL extends HTMLElement {
     let erwarteteRente = 0;
     let rentenluecke = 0;
 
-    vorsorgeLists.forEach(vorsorgeList => {
-      vorsorgeList.addEventListener('pension.added', (event: CustomEvent) => {
+    vorsorgeLists.forEach((vorsorgeList: VorsorgeList): void => {
+      vorsorgeList.addEventListener('pension.added', (event: CustomEvent<PensionInfo>): void => {
         bestehendeVorsorge = event.detail.summary;
       });
     });
 
-    forms.forEach(form => {
-      form.addEventListener('submit', event => {
+    forms.forEach((form: HTMLFormElement): void => {
+      form.addEventListener('submit', (event: SubmitEvent): void => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -45,7 +45,7 @@ class RL extends HTMLElement {
 
         form.classList.add('was-validated');
 
-        vorsorgeLists.forEach(vorsorgeList => {
+        vorsorgeLists.forEach((vorsorgeList: VorsorgeList) => {
           vorsorgeList.classList.add('was-validated');
         });
 
@@ -157,8 +157,8 @@ class RL extends HTMLElement {
 
     const fields = this.root.querySelectorAll<HTMLInputElement|HTMLSelectElement>('.needs-validation input, .needs-validation select');
 
-    fields.forEach(field => {
-      field.addEventListener('blur', event => {
+    fields.forEach((field: HTMLInputElement|HTMLSelectElement) => {
+      field.addEventListener('blur', (event: Event) => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -170,17 +170,17 @@ class RL extends HTMLElement {
     const pensionField = this.root.getElementById('rente');
 
     if (gebField instanceof HTMLInputElement && pensionField instanceof HTMLSelectElement) {
-      gebField.addEventListener('blur', () => {
+      gebField.addEventListener('blur', (): void => {
         this.checkAge(gebField, pensionField);
       }, false);
-      gebField.addEventListener('change', () => {
+      gebField.addEventListener('change', (): void => {
         this.checkAge(gebField, pensionField);
       }, false);
 
-      pensionField.addEventListener('blur', () => {
+      pensionField.addEventListener('blur', (): void => {
         this.checkAge(gebField, pensionField);
       }, false);
-      pensionField.addEventListener('change', () => {
+      pensionField.addEventListener('change', (): void => {
         this.checkAge(gebField, pensionField);
       }, false);
     }
@@ -188,18 +188,18 @@ class RL extends HTMLElement {
     const pensionsAvailableFields = this.root.querySelectorAll<HTMLInputElement>('.js-pensions-available');
     const pensionsFields = this.root.querySelectorAll<HTMLInputElement>('.pensions-available');
 
-    pensionsAvailableFields.forEach(field => {
-      field.addEventListener('change', event => {
+    pensionsAvailableFields.forEach((field: HTMLInputElement): void => {
+      field.addEventListener('change', (event: Event): void => {
         event.preventDefault();
         event.stopPropagation();
 
         if ('ja' === field.value) {
-          pensionsFields.forEach(pensionsField => {
+          pensionsFields.forEach((pensionsField: HTMLInputElement): void => {
             pensionsField.classList.remove('d-none');
           });
         }
         if ('nein' === field.value) {
-          pensionsFields.forEach(pensionsField => {
+          pensionsFields.forEach((pensionsField: HTMLInputElement): void => {
             pensionsField.classList.add('d-none');
           });
         }
@@ -235,7 +235,7 @@ class RL extends HTMLElement {
         placement: 'left',
       });
 
-      function show() {
+      function show(): void {
         if (null === tooltip) {
           return;
         }
@@ -247,7 +247,7 @@ class RL extends HTMLElement {
         popperInstance.update();
       }
 
-      function hide() {
+      function hide(): void {
         if (null === tooltip) {
           return;
         }
@@ -258,11 +258,11 @@ class RL extends HTMLElement {
       const showEvents = ['mouseenter', 'focus'];
       const hideEvents = ['mouseleave', 'blur'];
 
-      showEvents.forEach((event) => {
+      showEvents.forEach((event: string): void => {
         button.addEventListener(event, show);
       });
 
-      hideEvents.forEach((event) => {
+      hideEvents.forEach((event: string): void => {
         button.addEventListener(event, hide);
       });
     });
@@ -272,7 +272,7 @@ class RL extends HTMLElement {
     const inflationsButtons = this.root.querySelectorAll<HTMLButtonElement>('.inflation-settings');
 
     if (null !== inflationAn && null !== inflationsRate && inflationAn instanceof HTMLInputElement && inflationsRate instanceof HTMLInputElement) {
-      inflationAn.addEventListener('change', event => {
+      inflationAn.addEventListener('change', (event: Event): void => {
         if (null === event.target || !(event.target instanceof HTMLInputElement) || !(inflationsRate instanceof HTMLInputElement)) {
           return;
         }
@@ -295,7 +295,7 @@ class RL extends HTMLElement {
           );
         }
 
-        forms.forEach(form => {
+        forms.forEach((form: HTMLFormElement): void => {
           form.dispatchEvent(
               new SubmitEvent('submit', {
                 bubbles: false, // Whether the event will bubble up through the DOM or not
@@ -313,7 +313,7 @@ class RL extends HTMLElement {
         return;
       }
 
-      button.addEventListener('click', event => {
+      button.addEventListener('click', (event: MouseEvent): void => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -330,14 +330,14 @@ class RL extends HTMLElement {
       const sliderTooltips = this.root.querySelectorAll<HTMLOutputElement>('.slider-tooltip');
       const sliderRate = this.root.querySelectorAll<HTMLOutputElement>('.inflation-rate');
 
-      inflationsRate.addEventListener('input', event => {
+      inflationsRate.addEventListener('input', (event: Event): void => {
         event.preventDefault();
         event.stopPropagation();
 
-        sliderTooltips.forEach(sliderTooltip => {
+        sliderTooltips.forEach((sliderTooltip: HTMLOutputElement): void => {
           sliderTooltip.value = inflationsRate.value + '%';
         });
-        sliderRate.forEach(sliderTooltip => {
+        sliderRate.forEach((sliderTooltip: HTMLOutputElement): void => {
           sliderTooltip.value = inflationsRate.value + '%';
         });
 
@@ -349,19 +349,19 @@ class RL extends HTMLElement {
 
     const modalCloseButtons = this.root.querySelectorAll<HTMLButtonElement>('.btn-close');
 
-    modalCloseButtons.forEach(modalCloseButton => {
+    modalCloseButtons.forEach((modalCloseButton: HTMLButtonElement): void => {
       if (null === layer || !(layer instanceof HTMLDialogElement)) {
         return;
       }
 
-      modalCloseButton.addEventListener('click', event => {
+      modalCloseButton.addEventListener('click', (event: MouseEvent): void => {
         event.preventDefault();
         event.stopPropagation();
 
         layer.close();
         layer.setAttribute('aria-hidden', 'true');
 
-        forms.forEach(form => {
+        forms.forEach((form: HTMLFormElement): void => {
           form.dispatchEvent(
               new SubmitEvent('submit', {
                 bubbles: false, // Whether the event will bubble up through the DOM or not
@@ -442,21 +442,21 @@ class RL extends HTMLElement {
     }
   }
 
-  attributeChangedCallback(/*attrName: string, oldVal: string, newVal: string/**/) {
+  attributeChangedCallback(/*attrName: string, oldVal: string, newVal: string/**/): void {
     // nothing to do at the moment
     console.log('attributeChangedCallback hook');
   }
 
-  diconnectedCallback() {
+  diconnectedCallback(): void {
     // nothing to do at the moment
     console.log('diconnectedCallback hook');
   }
 
-  static get observedAttributes() {
+  static get observedAttributes(): string[] {
     return ['class'];
   }
 
-  get class() {
+  get class(): string|null {
     return this.getAttribute('class');
   }
 
@@ -468,13 +468,13 @@ class RL extends HTMLElement {
     }
   }
 
-  checkAge(gebField: HTMLInputElement, pensionField: HTMLSelectElement) {
+  checkAge(gebField: HTMLInputElement, pensionField: HTMLSelectElement): void {
     const Datum = new Date(),
       actualYear = Datum.getUTCFullYear(),
       invalidAgeMessages = this.root.querySelectorAll<HTMLDivElement>('.invalid-age-feedback');
 
     if ('' === gebField.value || '' === pensionField.value) {
-      invalidAgeMessages.forEach(invalidAgeMessage => {
+      invalidAgeMessages.forEach((invalidAgeMessage: HTMLDivElement): void => {
         invalidAgeMessage.style.display = 'none';
       });
       return;
@@ -487,19 +487,19 @@ class RL extends HTMLElement {
     gebField.checkValidity();
 
     if ((birthyear + pensionAge) >= (actualYear - 1)) {
-      invalidAgeMessages.forEach(invalidAgeMessage => {
+      invalidAgeMessages.forEach((invalidAgeMessage: HTMLDivElement): void => {
         invalidAgeMessage.style.display = 'none';
       });
 
       return;
     }
 
-    invalidAgeMessages.forEach(invalidAgeMessage => {
+    invalidAgeMessages.forEach((invalidAgeMessage: HTMLDivElement): void => {
       invalidAgeMessage.style.display = 'block';
     });
   }
 
-  getStyle() {
+  getStyle(): string {
     return `
     <style>
         @layer all, media, container;
@@ -1080,7 +1080,7 @@ class RL extends HTMLElement {
     `;
   }
 
-  render() {
+  render(): string {
     const Datum = new Date();
     return `
       ${this.getStyle()}
@@ -1357,7 +1357,7 @@ class RL extends HTMLElement {
 
     const sliders = this.root.querySelectorAll<HTMLInputElement>('.js-tooltip-slider');
 
-    sliders.forEach((slider: HTMLInputElement) => {
+    sliders.forEach((slider: HTMLInputElement): void => {
       const sliderValue = parseFloat(slider.value),
           sliderMax = parseFloat(slider.max),
           sliderMin = parseFloat(slider.min);

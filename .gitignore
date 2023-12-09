@@ -26,7 +26,9 @@ rewrite*.php
 .reports/
 node_modules/
 .build/
+dist/
 package-lock.json
 .reports
 *.bak
 *.txt
+junit-report.xml

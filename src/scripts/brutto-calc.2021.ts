@@ -59,7 +59,7 @@ export default class BruttoCalculation {
             minbrutto = 0;
 
         do {
-            this.baseCalc.calculate(state, taxClass, brutto, lzz, stTabelle, pvz, r, zkf);
+            this.baseCalc.calculate(taxClass, brutto, lzz, stTabelle, pvz, r, zkf);
 
             lst = this.baseCalc.getLstlzz() / 100;
             solz = this.baseCalc.getSolzlzz() / 100;

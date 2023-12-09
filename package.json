@@ -10,7 +10,12 @@
     "test": "tsc && vitest run",
     "coverage": "tsc && vitest run --coverage",
     "typecheck": "tsc && vitest typecheck",
-    "lint": "eslint . --ext .ts,.js"
+    "lint": "eslint . --ext .ts,.js",
+    "lint-fix": "eslint . --ext .ts,.js --fix"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "chart.js": "^4.4.0"
   },
   "devDependencies": {
     "@csstools/postcss-cascade-layers": "^4.0.0",
@@ -24,7 +29,10 @@
     "@csstools/postcss-unset-value": "^3.0.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@types/bootstrap": "^5.2.6",
+    "@types/intl": "^1.2.2",
     "@types/node": "^18.11.15",
+    "@types/chart.js": "^2.9.41",
+    "@typescript-eslint/typescript-estree": "^6.13.2",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.62.0 || ^6.13.2",
     "@vitest/coverage-istanbul": "0.34.1",
@@ -82,9 +90,5 @@
     "vite-plugin-stylelint": "^5.2.1",
     "vitest": "0.34.1",
     "yaml": "^2.3.4"
-  },
-  "dependencies": {
-    "@popperjs/core": "^2.11.8",
-    "chart.js": "^4.4.0"
   }
 }

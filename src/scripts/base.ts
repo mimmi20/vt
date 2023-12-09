@@ -35,7 +35,7 @@ export function initFilterDigits(): void {
                 new Event('change', {
                     bubbles: true, // Whether the event will bubble up through the DOM or not
                     cancelable: true, // Whether the event may be canceled or not
-                })
+                }),
             );
         }
     };

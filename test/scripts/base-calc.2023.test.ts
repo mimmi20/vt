@@ -1,17 +1,17 @@
-import { describe, it, expect, test } from 'vitest'
+import { describe, it, expect, test } from 'vitest';
 import BaseCalculation from '../../src/scripts/base-calc.2023';
 
-const tests: Object[] = [];
+const tests: TestInfo[] = [];
 
-for (let re4: number = 5000; re4 <= 90000; ) {
-  for (let stkl: number = 1; stkl < 2; stkl++) {
-    const taxTests = require ('../fixture-data/base-calc_' + re4 + '_' + stkl + '.json');
+for (let re4 = 5000; re4 <= 90000; ) {
+    for (let stkl = 1; stkl < 2; stkl++) {
+        const taxTests: TestInfo[] = require('../fixture-data/base-calc_' + re4.toString() + '_' + stkl.toString() + '.json');
 
-    taxTests.forEach(function(test: Object): void {
-      tests.push(test);
-    })
-  }
-  re4 += 2500;
+        taxTests.forEach(function (test: TestInfo): void {
+            tests.push(test);
+        });
+    }
+    re4 += 2500;
 }
 
 // const re4 = 85000;
@@ -23,92 +23,82 @@ for (let re4: number = 5000; re4 <= 90000; ) {
 //   tests.push(test);
 // })
 
-describe('base-calc', async () => {
-  await it.todo('unimplemented test');
+describe('base-calc', (): void => {
+    it.todo('unimplemented test');
 
-  await describe.each(tests)('calculate tax for tax class', async ({stkl, re4, lzz, krv, pvz, r, kvz, zkf, pkv, pvs, af, bk, bks, bkv, lstlzz, solzlzz, solzs, solzv, sts, stv, vkvlzz, vkvsonst, vfrb, vfrbs1, vfrbs2, wvfrb, wvfrbo, wvfrbm}) => {
+    describe.each(tests)(
+        'calculate tax for tax class',
+        ({ stkl, re4, lzz, krv, pvz, r, kvz, zkf, pkv, pvs, af, bk, bks, bkv, lstlzz, solzlzz, solzs, solzv, sts, stv, vkvlzz, vkvsonst, vfrb, vfrbs1, vfrbs2, wvfrb, wvfrbo, wvfrbm }): void => {
+            const baseCalc = new BaseCalculation();
+            baseCalc.calculate(stkl, re4, lzz, krv, pvz === 1, r, kvz, zkf, pkv, pvs === 1, af === 1);
 
-    const baseCalc = await new BaseCalculation();
-    await baseCalc.calculate(
-      stkl,
-      re4,
-      lzz,
-      krv,
-      pvz === 1,
-      r,
-      kvz,
-      zkf,
-      pkv,
-      pvs === 1,
-      af === 1
+            test(`calculate lstlzz for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getLstlzz()).toBe(lstlzz);
+            });
+
+            test(`calculate solzlzz for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getSolzlzz()).toBe(solzlzz);
+            });
+
+            test(`calculate bk for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getBk()).toBe(bk);
+            });
+
+            test(`calculate bks for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getBks()).toBe(bks);
+            });
+
+            test(`calculate bkv for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getBkv()).toBe(bkv);
+            });
+
+            test(`calculate solzs for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getSolzs()).toBe(solzs);
+            });
+
+            test(`calculate solzv for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getSolzv()).toBe(solzv);
+            });
+
+            test(`calculate sts for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getSts()).toBe(sts);
+            });
+
+            test(`calculate stv for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getStv()).toBe(stv);
+            });
+
+            test(`calculate vkvlzz for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getVkvlzz()).toBe(vkvlzz);
+            });
+
+            test(`calculate vkvsonst for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getVkvsonst()).toBe(vkvsonst);
+            });
+
+            test(`calculate vfrb for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getVfrb()).toBe(vfrb);
+            });
+
+            test(`calculate vfrbs1 for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getVfrbs1()).toBe(vfrbs1);
+            });
+
+            test(`calculate vfrbs2 for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getVfrbs2()).toBe(vfrbs2);
+            });
+
+            test(`calculate wvfrb for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getWvfrb()).toBe(wvfrb);
+            });
+
+            test(`calculate wvfrbo for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getWvfrbo()).toBe(wvfrbo);
+            });
+
+            test(`calculate wvfrbm for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, (): void => {
+                expect(baseCalc.getWvfrbm()).toBe(wvfrbm);
+            });
+        },
     );
-
-    await test(`calculate lstlzz for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getLstlzz()).toBe(lstlzz);
-    })
-
-    await test(`calculate solzlzz for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getSolzlzz()).toBe(solzlzz);
-    })
-
-    await test(`calculate bk for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getBk()).toBe(bk);
-    })
-
-    await test(`calculate bks for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getBks()).toBe(bks);
-    })
-
-    await test(`calculate bkv for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getBkv()).toBe(bkv);
-    })
-
-    await test(`calculate solzs for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getSolzs()).toBe(solzs);
-    })
-
-    await test(`calculate solzv for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getSolzv()).toBe(solzv);
-    })
-
-    await test(`calculate sts for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getSts()).toBe(sts);
-    })
-
-    await test(`calculate stv for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getStv()).toBe(stv);
-    })
-
-    await test(`calculate vkvlzz for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getVkvlzz()).toBe(vkvlzz);
-    })
-
-    await test(`calculate vkvsonst for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getVkvsonst()).toBe(vkvsonst);
-    })
-
-    await test(`calculate vfrb for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      expect(baseCalc.getVfrb()).toBe(vfrb);
-    })
-
-    await test(`calculate vfrbs1 for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getVfrbs1()).toBe(vfrbs1);
-    })
-
-    await test(`calculate vfrbs2 for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getVfrbs2()).toBe(vfrbs2);
-    })
-
-    await test(`calculate wvfrb for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getWvfrb()).toBe(wvfrb);
-    })
-
-    await test(`calculate wvfrbo for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getWvfrbo()).toBe(wvfrbo);
-    })
-
-    await test(`calculate wvfrbm for stkl: ${stkl}, re4: ${re4 / 100}, lzz: ${lzz}, krv: ${krv}, pvz: ${pvz}, r: ${r}, kvz: ${kvz}, zkf: ${zkf}, pkv: ${pkv}, pvs: ${pvs}, af: ${af}`, async () => {
-      await expect(baseCalc.getWvfrbm()).toBe(wvfrbm);
-    })
-  });
-})
+});

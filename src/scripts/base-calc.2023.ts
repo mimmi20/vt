@@ -11,10 +11,10 @@ export default class BaseCalculation {
     private readonly KRV_GES_OST = 1;
     private readonly KRV_SONST = 2;
 
-  /**
-   * gesetzlich krankenversicherte Arbeitnehmer
-   */
-  public readonly PKV_GES = 0;
+    /**
+     * gesetzlich krankenversicherte Arbeitnehmer
+     */
+    public readonly PKV_GES = 0;
 
     /**
      * ausschließlich privat krankenversicherte Arbeitnehmer ohne Arbeitgeberzuschuss

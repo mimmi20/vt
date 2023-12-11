@@ -32,7 +32,6 @@ jobs:
           - "ubuntu-22.04"
 
         node-version:
-          - "16"
           - "18"
           - "20"
           - "21"

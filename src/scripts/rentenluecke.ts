@@ -1,8 +1,8 @@
 import * as STATES from './states';
 import * as CONFIG from './calc.config';
-import BruttoCalculation from './brutto-calc.2021';
+import BruttoCalculation from './brutto-calc.2023';
 import BaseCalculation from './base-calc.2023';
-import KstCalculation from './kst-calc.2021';
+import KstCalculation from './kst-calc.2023';
 import { escapeHtml } from './base';
 
 export default class Rentenluecke {

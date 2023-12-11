@@ -14,7 +14,7 @@ export default class BaseCalculation {
     /**
      * gesetzlich krankenversicherte Arbeitnehmer
      */
-    private readonly PKV_GES = 0;
+    public readonly PKV_GES = 0;
 
     /**
      * ausschließlich privat krankenversicherte Arbeitnehmer ohne Arbeitgeberzuschuss

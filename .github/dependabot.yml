@@ -52,6 +52,9 @@ updates:
        - dependency-name: "@vitest/coverage-istanbul"
          versions:
            - ">= 0.34.2"
+       - dependency-name: "@vitest/ui"
+         versions:
+           - ">= 0.34.2"
        - dependency-name: "vitest"
          versions:
            - ">= 0.34.2"

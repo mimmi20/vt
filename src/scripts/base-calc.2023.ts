@@ -857,7 +857,7 @@ export default class BaseCalculation {
     private jvbez = 0;
 
     /**
-     * In SONSTB enthaltene Versorgungsbezüge einschließlich Sterbegeld in Cent (ggf. 0)
+     * In SONSTB enthaltene Versorgungsbezüge, einschließlich Sterbegeld in Cent (ggf. 0)
      *
      * @var int
      */
@@ -1866,12 +1866,9 @@ export default class BaseCalculation {
             solzszve = this.zve;
         }
 
-        let x: number;
+        let x = 0.0;
 
-        if (1 > solzszve) {
-            solzszve = 0;
-            x = 0.0;
-        } else {
+        if (solzszve >= 1) {
             if (null === this.kztab) {
                 throw new Error('kztab not set');
             }
@@ -1887,7 +1884,7 @@ export default class BaseCalculation {
             st = this.MST56(x);
         }
 
-        const solzsbmg = this.floor(st * this.f);
+        const solzsbmg: number = this.floor(st * this.f);
 
         if (solzsbmg > this.solzfrei) {
             return this.floor(this.sts * 5.5) / 100;

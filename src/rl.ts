@@ -51,28 +51,28 @@ class RL extends HTMLElement {
                     });
 
                     if (valid) {
-                        const data = new FormData(form),
-                            state = data.get('state'),
-                            stkl = data.get('stkl'),
-                            netto = data.get('netto'),
-                            anzahl = data.get('anzahl'),
-                            geb = data.get('geb'),
-                            rente = data.get('rente'),
-                            alter = data.get('alter'),
-                            inflationsrate = data.get('inflationsrate'),
-                            inflationAn = data.get('inflationAn');
+                        const data: FormData = new FormData(form),
+                            state: FormDataEntryValue | null = data.get('state'),
+                            stkl: FormDataEntryValue | null = data.get('stkl'),
+                            netto: FormDataEntryValue | null = data.get('netto'),
+                            anzahl: FormDataEntryValue | null = data.get('anzahl'),
+                            geb: FormDataEntryValue | null = data.get('geb'),
+                            rente: FormDataEntryValue | null = data.get('rente'),
+                            alter: FormDataEntryValue | null = data.get('alter'),
+                            inflationsrate: FormDataEntryValue | null = data.get('inflationsrate'),
+                            inflationAn: FormDataEntryValue | null = data.get('inflationAn');
 
                         if (null !== state && null !== stkl && null !== netto) {
                             const calculationResult = Rentenluecke.calculate(
-                                state.toString() || '',
-                                parseInt(stkl.toString(), 10),
-                                parseInt(netto.toString(), 10),
-                                parseInt((anzahl || 0).toString(), 10),
-                                parseInt((geb || 0).toString(), 10),
-                                parseInt((rente || 0).toString(), 10),
-                                parseInt((alter || 0).toString(), 10),
-                                parseFloat((inflationsrate || 0.0).toString()),
-                                !!(inflationAn || false),
+                                !(state instanceof File) ? state.toString() || '' : '',
+                                !(stkl instanceof File) ? parseInt(stkl.toString(), 10) : 0,
+                                !(netto instanceof File) ? parseInt(netto.toString(), 10) : 0,
+                                !(anzahl instanceof File) ? parseInt((anzahl || 0).toString(), 10) : 0,
+                                !(geb instanceof File) ? parseInt((geb || 0).toString(), 10) : 0,
+                                !(rente instanceof File) ? parseInt((rente || 0).toString(), 10) : 0,
+                                !(alter instanceof File) ? parseInt((alter || 0).toString(), 10) : 0,
+                                !(inflationsrate instanceof File) ? parseFloat((inflationsrate || 0.0).toString()) : 0,
+                                !(inflationAn instanceof File) ? !!(inflationAn || false) : false,
                                 LZZ.LZZ_JAHR,
                                 KRV.KRV_TABELLE_ALLGEMEIN,
                                 true, // kinderlos u. über 23J.

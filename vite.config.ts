@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitest/config';
-import * as path from 'path';
 import stylelint from 'vite-plugin-stylelint';
 import eslint from 'vite-plugin-eslint';
 
@@ -13,8 +12,16 @@ export default defineConfig({
     manifest: true,
   },
   css: {
-    devSourcemap: false,
-    postcss: path.resolve(__dirname, 'postcss.config.json'),
+    devSourcemap: true,
+    transformer: 'postcss',
+    preprocessorOptions: {
+      scss: {
+        outputStyle: 'expanded',
+        alertAscii: true,
+        alertColor: true,
+        verbose: true,
+      }
+    }
   },
   server: {
     port: 8080,
@@ -39,6 +46,6 @@ export default defineConfig({
     },
     testTimeout: 20000,
     // node14 segfaults often with threads
-    threads: !process.versions.node.startsWith('14'),
+    threads: !process.versions.node.startsWith('14')
   },
 })

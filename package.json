@@ -7,8 +7,8 @@
     "dev": "tsc && vite",
     "build": "tsc && vite build",
     "preview": "tsc && vite preview",
-    "test": "tsc && vitest run",
-    "coverage": "tsc && vitest run --coverage",
+    "test": "tsc && vite build && vitest run",
+    "coverage": "tsc && vite build && vitest run --coverage",
     "typecheck": "tsc && vitest typecheck",
     "lint": "eslint . --ext .ts,.js",
     "lint-fix": "eslint . --ext .ts,.js --fix"

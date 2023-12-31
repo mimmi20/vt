@@ -16,8 +16,88 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate-yaml:
+    name: "Validate yaml"
+
+    runs-on: "${{ matrix.operating-system }}"
+    timeout-minutes: 10
+    continue-on-error: false
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        operating-system:
+          - "ubuntu-22.04"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
+          lfs: false
+          persist-credentials: false
+
+      - name: "Run yamllint"
+        uses: "actionshub/yamllint@v1.8.2"
+
+  markdownlint:
+    name: "Validate markdown files"
+
+    runs-on: "${{ matrix.operating-system }}"
+    timeout-minutes: 10
+    continue-on-error: false
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        operating-system:
+          - "ubuntu-22.04"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
+          lfs: false
+          persist-credentials: false
+
+      - name: "Run markdownlint"
+        uses: "DavidAnson/markdownlint-cli2-action@v14"
+        with:
+          globs: '*.md,**/*.md'
+          separator: ','
+
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  lint-status:
+    name: "Lint & Validate Status"
+
+    runs-on: "ubuntu-22.04"
+
+    if: always()
+
+    needs:
+      - "validate-yaml"
+      - "markdownlint"
+
+    steps:
+      - name: Failing run
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
+      - name: Successful run
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+
   tests:
     name: "UnitTests with vitest"
+
+    needs:
+      - "lint-status"
 
     runs-on: "${{ matrix.operating-system }}"
     timeout-minutes: 10

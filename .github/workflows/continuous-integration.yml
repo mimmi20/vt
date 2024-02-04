@@ -21,7 +21,7 @@ jobs:
 
     uses: "mimmi20/ci/.github/workflows/validate.yml@master"
     with:
-      extensions: "ctype, curl, iconv, mbstring, intl, dom, simplexml, tokenizer, xml, xmlwriter"
+      extensions: "ctype, curl, dom, iconv, intl, mbstring, simplexml, tokenizer, xml, xmlwriter"
       ini-values: "opcache.enable=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
       composer-options: "--optimize-autoloader --prefer-dist --prefer-stable -v"
       skip-validate-composer: true
@@ -78,6 +78,8 @@ jobs:
           file: ".reports/clover.xml"
           flags: "vitest,nodejs-${{ matrix.node-version }},${{ matrix.operating-system }}"
           verbose: false
+        env:
+          CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.

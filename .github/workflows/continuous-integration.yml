@@ -81,6 +81,14 @@ jobs:
         env:
           CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
+      - name: "Upload coverage to Codeclimate"
+        uses: "paambaati/codeclimate-action@v5.0.0"
+        env:
+          CC_TEST_REPORTER_ID: "${{ secrets.CODECLIMATE_API_KEY }}"
+        with:
+          coverageLocations: ".reports/clover.xml:clover"
+          debug: false
+
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
   tests-status:

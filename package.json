@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "chart.js": "^4.4.1"
+    "chart.js": "^4.4.2"
   },
   "devDependencies": {
     "@csstools/postcss-cascade-layers": "^4.0.3",
@@ -32,12 +32,12 @@
     "@types/bootstrap": "^5.2.10",
     "@types/chart.js": "^2.9.41",
     "@types/intl": "^1.2.2",
-    "@types/node": "^20.11.20",
-    "@typescript-eslint/typescript-estree": "^7.0.2",
-    "@typescript-eslint/eslint-plugin": "^7.0.2",
-    "@typescript-eslint/parser": "^7.0.2",
+    "@types/node": "^20.11.24",
+    "@typescript-eslint/typescript-estree": "^7.1.0",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
     "@vitest/coverage-istanbul": "0.34.1",
-    "autoprefixer": "^10.4.17",
+    "autoprefixer": "^10.4.18",
     "browserslist": "^4.23.0",
     "cssnano": "^6.0.5",
     "cssnano-preset-default": "^6.0.5",
@@ -65,7 +65,7 @@
     "postcss-media-minmax": "^5.0.0",
     "postcss-modules": "^6.0.0",
     "postcss-nested": "^6.0.1",
-    "postcss-nesting": "^12.0.3",
+    "postcss-nesting": "^12.0.4",
     "postcss-opacity-percentage": "^2.0.0",
     "postcss-overflow-shorthand": "^5.0.1",
     "postcss-prefix-selector": "^1.16.0",
@@ -89,7 +89,7 @@
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-stylelint": "^5.3.1",
     "vitest": "0.34.1",
-    "yaml": "^2.3.4"
+    "yaml": "^2.4.0"
   },
   "engines" : {
     "node" : ">=18.0.0"

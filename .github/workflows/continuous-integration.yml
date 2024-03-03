@@ -43,7 +43,6 @@ jobs:
 
       matrix:
         operating-system:
-          - "ubuntu-20.04"
           - "ubuntu-22.04"
 
         node-version:
@@ -93,7 +92,7 @@ jobs:
         uses: "coverallsapp/github-action@v2"
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          flag-name: "php ${{ matrix.php-version }} on ${{ matrix.operating-system }}"
+          flag-name: "nodeJS ${{ matrix.node-version }} on ${{ matrix.operating-system }}"
           parallel: true
           file: ".reports/clover.xml"
           format: "clover"
@@ -102,7 +101,7 @@ jobs:
   finish-code-coverage:
     runs-on: "ubuntu-22.04"
 
-    needs: "code-coverage"
+    needs: "tests"
 
     if: always()
 

@@ -43,7 +43,6 @@ jobs:
 
       matrix:
         operating-system:
-          - "ubuntu-20.04"
           - "ubuntu-22.04"
 
         node-version:
@@ -88,6 +87,29 @@ jobs:
         with:
           coverageLocations: ".reports/clover.xml:clover"
           debug: false
+
+      - name: "Upload coverage to Coveralls"
+        uses: "coverallsapp/github-action@v2"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          flag-name: "nodeJS ${{ matrix.node-version }} on ${{ matrix.operating-system }}"
+          parallel: true
+          file: ".reports/clover.xml"
+          format: "clover"
+          debug: false
+
+  finish-code-coverage:
+    runs-on: "ubuntu-22.04"
+
+    needs: "tests"
+
+    if: always()
+
+    steps:
+      - name: "Coveralls Finished"
+        uses: "coverallsapp/github-action@v2"
+        with:
+          parallel-finished: true
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.

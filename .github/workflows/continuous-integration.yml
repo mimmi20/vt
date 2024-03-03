@@ -89,6 +89,29 @@ jobs:
           coverageLocations: ".reports/clover.xml:clover"
           debug: false
 
+      - name: "Upload coverage to Coveralls"
+        uses: "coverallsapp/github-action@v2"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          flag-name: "php ${{ matrix.php-version }} on ${{ matrix.operating-system }}"
+          parallel: true
+          file: ".reports/clover.xml"
+          format: "clover"
+          debug: false
+
+  finish-code-coverage:
+    runs-on: "ubuntu-22.04"
+
+    needs: "code-coverage"
+
+    if: always()
+
+    steps:
+      - name: "Coveralls Finished"
+        uses: "coverallsapp/github-action@v2"
+        with:
+          parallel-finished: true
+
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
   tests-status:

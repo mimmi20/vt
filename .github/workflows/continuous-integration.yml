@@ -59,13 +59,16 @@ jobs:
           lfs: false
           persist-credentials: false
 
+      - name: "install libimagequant-dev"
+        run: "sudo apt-get install libimagequant-dev -y"
+
       - name: "Use Node.js ${{ matrix.node-version }}"
         uses: "actions/setup-node@v4"
         with:
           node-version: "${{ matrix.node-version }}"
 
       - name: "install dependencies"
-        run: "npm install --frozen-lockfile"
+        run: "npm install"
 
       - name: "Run tests and generate coverage report"
         run: "npm run coverage"

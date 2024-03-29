@@ -60,7 +60,7 @@ jobs:
           persist-credentials: false
 
       - name: "install libimagequant-dev"
-        run: "apt-get install libimagequant-dev -y"
+        run: "sudo apt-get install libimagequant-dev -y"
 
       - name: "Use Node.js ${{ matrix.node-version }}"
         uses: "actions/setup-node@v4"

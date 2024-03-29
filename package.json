@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "chart.js": "^4.4.2"
+    "chart.js": "^4.4.2",
+    "fe-tools": "github:mimmi20/fe-tools#master"
   },
   "devDependencies": {
     "@csstools/postcss-cascade-layers": "^4.0.3",
@@ -37,6 +38,7 @@
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
     "@vitest/coverage-istanbul": "0.34.1",
+    "@vitest/ui": "0.34.1",
     "autoprefixer": "^10.4.19",
     "browserslist": "^4.23.0",
     "cssnano": "^6.1.1",
@@ -93,5 +95,6 @@
   },
   "engines" : {
     "node" : ">=18.0.0"
-  }
+  },
+  "packageManager": "^npm@9.6.6"
 }

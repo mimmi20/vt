@@ -47,7 +47,6 @@ jobs:
 
         node-version:
           - "20"
-          - "21"
           - "22"
 
     steps:

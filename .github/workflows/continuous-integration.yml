@@ -46,9 +46,9 @@ jobs:
           - "ubuntu-22.04"
 
         node-version:
-          - "18"
           - "20"
           - "21"
+          - "22"
 
     steps:
       - name: "Checkout"

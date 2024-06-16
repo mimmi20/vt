@@ -48,7 +48,9 @@ jobs:
       - "install"
 
     runs-on: "${{ matrix.operating-system }}"
+
     timeout-minutes: 10
+
     continue-on-error: false
 
     strategy:

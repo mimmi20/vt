@@ -37,8 +37,8 @@
     "@typescript-eslint/typescript-estree": "^7.13.0",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@typescript-eslint/parser": "^7.13.0",
-    "@vitest/coverage-istanbul": "0.34.1",
-    "@vitest/ui": "0.34.1",
+    "@vitest/coverage-istanbul": "0.34.6",
+    "@vitest/ui": "0.34.7",
     "autoprefixer": "^10.4.19",
     "browserslist": "^4.23.1",
     "cssnano": "^7.0.2",
@@ -90,11 +90,11 @@
     "vite-plugin-dts": "^3.9.1",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-stylelint": "^5.3.1",
-    "vitest": "0.34.1",
+    "vitest": "0.34.6",
     "yaml": "^2.4.5"
   },
   "engines" : {
-    "node" : ">=18.0.0"
+    "node" : ">=18.20.3"
   },
   "packageManager": "^npm@9.6.6"
 }

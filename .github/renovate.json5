@@ -55,6 +55,10 @@
       "rangeStrategy": "widen"
     },
     {
+      "matchPackageNames": ["vitest", "@vitest/coverage-istanbul", "@vitest/ui"],
+      "enabled": false
+    },
+    {
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch-dependencies",
       "matchUpdateTypes": [

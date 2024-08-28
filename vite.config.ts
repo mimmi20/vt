@@ -1,6 +1,12 @@
 import { defineConfig } from 'vitest/config';
 import stylelint from 'vite-plugin-stylelint';
 import eslint from 'vite-plugin-eslint';
+import { resolveToEsbuildTarget } from 'esbuild-plugin-browserslist';
+import browserslist from 'browserslist';
+
+const target = resolveToEsbuildTarget(browserslist('defaults'), {
+  printUnknownTargets: false,
+});
 
 export default defineConfig({
   root: __dirname,
@@ -10,6 +16,7 @@ export default defineConfig({
   ],
   build: {
     manifest: true,
+    target: target,
   },
   css: {
     devSourcemap: true,

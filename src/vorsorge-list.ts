@@ -14,7 +14,8 @@ class VorsorgeList extends HTMLElement {
 
         const pensionsAvailableFields = this.root.querySelectorAll<HTMLInputElement>('.js-pensions-available');
         const pensionsFields = this.root.querySelectorAll<HTMLInputElement>('.pensions-available');
-        const addButtons = this.root.querySelectorAll<HTMLTableSectionElement>('.js-add-button');
+        const addButtons = this.root.querySelectorAll<HTMLButtonElement>('.js-add-button');
+        const favDialog = this.root.getElementById('favDialog');
 
         pensionsAvailableFields.forEach((field) => {
             field.addEventListener('change', (event) => {
@@ -49,36 +50,58 @@ class VorsorgeList extends HTMLElement {
             addButton.addEventListener(
                 'click',
                 () => {
+                    console.log('button clicked', favDialog instanceof HTMLDialogElement);
+
                     const vorsorgeart = this.root.querySelectorAll<HTMLInputElement>('[name="vorsorgeart"]:checked');
                     const vorsorgebetrag = this.root.querySelectorAll<HTMLInputElement>('[name="vorsorgebetrag"]');
 
-                    if (vorsorgeart.length === 0 || vorsorgebetrag.length === 0) {
+                    if (vorsorgeart.length === 0 || vorsorgebetrag.length === 0 || !(favDialog instanceof HTMLDialogElement)) {
                         return;
                     }
 
-                    this.pensions.push({ id: this.pensions.length, amount: parseInt(vorsorgebetrag[0].value, 10), type: vorsorgeart[0].value });
-
                     this.renderTable();
 
-                    let summaryPension = 0;
+                    favDialog.showModal();
 
-                    this.pensions.forEach((pension) => {
-                        summaryPension += pension.amount;
-                    });
-
-                    this.dispatchEvent(
-                        new CustomEvent<PensionInfo>('pension.added', {
-                            detail: {
-                                summary: summaryPension,
-                                bubbles: true, // Whether the event will bubble up through the DOM or not
-                                cancelable: false, // Whether the event may be canceled or not
-                            },
-                        }),
-                    );
+                    // this.pensions.push({ id: this.pensions.length, amount: parseInt(vorsorgebetrag[0].value, 10), type: vorsorgeart[0].value });
+                    //
+                    // this.renderTable();
+                    //
+                    // let summaryPension = 0;
+                    //
+                    // this.pensions.forEach((pension) => {
+                    //     summaryPension += pension.amount;
+                    // });
+                    //
+                    // this.dispatchEvent(
+                    //     new CustomEvent<PensionInfo>('pension.added', {
+                    //         detail: {
+                    //             summary: summaryPension,
+                    //             bubbles: true, // Whether the event will bubble up through the DOM or not
+                    //             cancelable: false, // Whether the event may be canceled or not
+                    //         },
+                    //     }),
+                    // );
                 },
                 false,
             );
         });
+
+        if (favDialog instanceof HTMLDialogElement) {
+            const confirmBtn = favDialog.querySelector<HTMLButtonElement>('#confirmBtn');
+            const selectEl = favDialog.querySelector<HTMLSelectElement>('select');
+
+            favDialog.addEventListener('close', () => {
+                // something to do
+            });
+
+            if (confirmBtn instanceof HTMLButtonElement) {
+                confirmBtn.addEventListener('click', (event) => {
+                    event.preventDefault(); // We don't want to submit this fake form
+                    favDialog.close(selectEl?.value); // Have to send the select box value here.
+                });
+            }
+        }
 
         this.renderTable();
     }
@@ -456,12 +479,19 @@ class VorsorgeList extends HTMLElement {
             </div>
           </div>
         </div>
-        <div class="pensions-available added-pension-wrapper my-4 d-none">
+        <div class="pensions-available my-4">
           <table class="added-pension">
             <caption class="added-pension-headline">Bereits bestehende Vorsorgen:</caption>
             <tbody class="js-pensions-rows-available added-pension-content d-none">
               <tr class="added-pension-item row row-nowrap"></tr>
             </tbody>
+            <thead class="">
+              <tr class=row row-nowrap">
+                <td colspan="2" class="text-end">
+                  <button class="btn btn-sm btn-outline-primary js-add-button">Vorsorge hinzufügen</button>
+                </td>
+              </tr>
+            </thead>
             <tfoot class="js-no-pensions-rows-available added-pension-content d-none">
               <tr class="added-pension-item row row-nowrap">
                 <td colspan="2">Es wurden noch keine Vorsorgen eingegeben</td>
@@ -491,9 +521,24 @@ class VorsorgeList extends HTMLElement {
             <div class="invalid-min-feedback">Der Wert muss größer 0 sein.</div>
           </div>
         </fieldset>
-        <div class="pensions-available text-start d-none button-box">
-          <button class="btn btn-sm btn-outline-primary js-add-button">Vorsorge hinzufügen</button>
-        </div>
+        <dialog id="favDialog">
+          <form>
+            <p>
+              <label>
+                Favorite animal:
+                <select>
+                  <option value="default">Choose…</option>
+                  <option>Brine shrimp</option>
+                  <option>Red panda</option>
+                  <option>Spider monkey</option>
+                </select>
+              </label>
+            </p>
+            <div>
+              <button id="confirmBtn" value="default">Confirm</button>
+            </div>
+          </form>
+        </dialog>
       </div>
     `;
     }

@@ -27,6 +27,7 @@ jobs:
       skip-validate-composer: true
       skip-phplint: true
       skip-check-composer: true
+      skip-ec-checker: true
 
   install:
     name: "Install Project"

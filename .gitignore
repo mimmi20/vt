@@ -21,6 +21,7 @@ tests/temp/*.ini
 .phplint-cache
 .phpunit.result.cache
 .phpcs.cache
+.stylelintcache
 infection-*.log
 rewrite*.php
 .reports/
@@ -32,3 +33,9 @@ package-lock.json
 *.bak
 *.txt
 junit-report.xml
+/src/**/*.js
+/src/**/*.map
+/src/**/*.d.ts
+/cypress/**/*.js
+/cypress/**/*.map
+/cypress/**/*.d.ts

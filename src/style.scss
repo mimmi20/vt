@@ -3,16 +3,14 @@
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
-
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -33,31 +31,31 @@ body {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: #fff;
   }
 }
 
 vt-rl {
-  --vt-helptext-color: #aaaaaa;
+  --vt-helptext-color: #aaa;
   --vt-helptext-fontsize: .8em;
   --vt-optional-message-color: green;
-  --vt-danger-text-color: #000000;
+  --vt-danger-text-color: #000;
   --vt-danger-message-color: red;
   --vt-danger-background-color: red;
   --vt-danger-border-color: red;
-  --vt-warning-text-color: #000000;
+  --vt-warning-text-color: #000;
   --vt-warning-background-color: orange;
   --vt-warning-border-color: orange;
   --vt-alert-border-color: pink;
-  --vt-background-color: #ffffff;
-  --vt-button-color: #ffffff;
-  --vt-button-background-color: #000000;
-  --vt-button-border-color: #000000;
+  --vt-background-color: #fff;
+  --vt-button-color: #fff;
+  --vt-button-background-color: #000;
+  --vt-button-border-color: #000;
   --vt-button-border-radius: 0.25rem;
   --vt-form-border-radius: 0.25rem;
   --vt-form-border-width: 2px;
   --vt-form-border-color: #ced4da;
   --vt-form-valid-color: green;
   --vt-form-invalid-color: red;
-  --vt-form-color: #000000;
+  --vt-form-color: #000;
 }

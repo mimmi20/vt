@@ -16,13 +16,13 @@ export const BUNDESLAND_SA = 'Sachsen-Anhalt';
 export const BUNDESLAND_TH = 'Thüringen';
 
 export function isStateEast(state: string): boolean {
-    const statesEast = [BUNDESLAND_BB, BUNDESLAND_MV, BUNDESLAND_SA, BUNDESLAND_SN, BUNDESLAND_TH];
+  const statesEast = [BUNDESLAND_BB, BUNDESLAND_MV, BUNDESLAND_SA, BUNDESLAND_SN, BUNDESLAND_TH];
 
-    return statesEast.indexOf(state) !== -1;
+  return statesEast.indexOf(state) !== -1;
 }
 
 export function isStateWest(state: string): boolean {
-    const statesWest = [BUNDESLAND_B, BUNDESLAND_BW, BUNDESLAND_BY, BUNDESLAND_HB, BUNDESLAND_HE, BUNDESLAND_HH, BUNDESLAND_NS, BUNDESLAND_NW, BUNDESLAND_RP, BUNDESLAND_SH, BUNDESLAND_SL];
+  const statesWest = [BUNDESLAND_B, BUNDESLAND_BW, BUNDESLAND_BY, BUNDESLAND_HB, BUNDESLAND_HE, BUNDESLAND_HH, BUNDESLAND_NS, BUNDESLAND_NW, BUNDESLAND_RP, BUNDESLAND_SH, BUNDESLAND_SL];
 
-    return statesWest.indexOf(state) !== -1;
+  return statesWest.indexOf(state) !== -1;
 }

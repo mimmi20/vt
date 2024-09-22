@@ -10,532 +10,532 @@ import VorsorgeList from './vorsorge-list';
 customElements.define('vorsorge-list', VorsorgeList);
 
 class RL extends HTMLElement {
-    private root: ShadowRoot;
-    private chartObject: Chart<'doughnut'> | null = null;
+  private root: ShadowRoot;
+  private chartObject: Chart<'doughnut'> | null = null;
 
-    constructor() {
-        super();
+  constructor() {
+    super();
 
-        this.root = this.attachShadow({ mode: 'closed' });
+    this.root = this.attachShadow({ mode: 'closed' });
+  }
+
+  connectedCallback() {
+    this.root.innerHTML = this.render();
+
+    const forms = this.root.querySelectorAll<HTMLFormElement>('.needs-validation');
+    const vorsorgeLists = this.root.querySelectorAll<VorsorgeList>('vorsorge-list');
+
+    let bestehendeVorsorge = 0;
+    let erwarteteRente = 0;
+    const rentenluecke = 0;
+
+    vorsorgeLists.forEach((vorsorgeList: VorsorgeList): void => {
+      vorsorgeList.addEventListener('pension.added', (event: CustomEvent<PensionInfo>): void => {
+        bestehendeVorsorge = event.detail.summary;
+      });
+    });
+
+    forms.forEach((form: HTMLFormElement): void => {
+      form.addEventListener(
+        'submit',
+        (event: SubmitEvent): void => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const valid = form.checkValidity();
+
+          form.classList.add('was-validated');
+
+          vorsorgeLists.forEach((vorsorgeList: VorsorgeList) => {
+            vorsorgeList.classList.add('was-validated');
+          });
+
+          if (valid) {
+            const data: FormData = new FormData(form),
+              state: FormDataEntryValue | null = data.get('state'),
+              stkl: FormDataEntryValue | null = data.get('stkl'),
+              netto: FormDataEntryValue | null = data.get('netto'),
+              anzahl: FormDataEntryValue | null = data.get('anzahl'),
+              geb: FormDataEntryValue | null = data.get('geb'),
+              rente: FormDataEntryValue | null = data.get('rente'),
+              alter: FormDataEntryValue | null = data.get('alter'),
+              inflationsrate: FormDataEntryValue | null = data.get('inflationsrate'),
+              inflationAn: FormDataEntryValue | null = data.get('inflationAn');
+
+            if (null !== state && null !== stkl && null !== netto) {
+              const calculationResult = Rentenluecke.calculate(
+                !(state instanceof File) ? state.toString() || '' : '',
+                !(stkl instanceof File) ? parseInt(stkl.toString(), 10) : 0,
+                !(netto instanceof File) ? parseInt(netto.toString(), 10) : 0,
+                !(anzahl instanceof File) ? parseInt((anzahl || 0).toString(), 10) : 0,
+                !(geb instanceof File) ? parseInt((geb || 0).toString(), 10) : 0,
+                !(rente instanceof File) ? parseInt((rente || 0).toString(), 10) : 0,
+                !(alter instanceof File) ? parseInt((alter || 0).toString(), 10) : 0,
+                !(inflationsrate instanceof File) ? parseFloat((inflationsrate || 0.0).toString()) : 0,
+                !(inflationAn instanceof File) ? !!(inflationAn || false) : false,
+                LZZ.LZZ_JAHR,
+                KRV.KRV_TABELLE_ALLGEMEIN,
+                true, // kinderlos u. über 23J.
+                1, // Kirchensteuer berechnen
+                0.0 // Anzahl Kinderfreibeträge
+              );
+
+              if (!calculationResult.valid) {
+                return;
+              }
+
+              const monatsBedarf = calculationResult.monatsBedarf || 0,
+                monatsRente = calculationResult.monatsRente || 0,
+                kv = calculationResult.kv || 0,
+                steuer = calculationResult.steuer || 0;
+
+              erwarteteRente = calculationResult.nettoRente || 0;
+
+              let rentenluecke = monatsBedarf - (erwarteteRente + bestehendeVorsorge);
+
+              if (rentenluecke <= 0) {
+                rentenluecke = 0;
+              }
+
+              const resultData = {
+                type: 'rentenluecke',
+                monatsBedarf: monatsBedarf,
+                monatsRente: monatsRente,
+                kv: kv,
+                steuer: steuer,
+              };
+
+              document.dispatchEvent(
+                new CustomEvent('rl.calculated', {
+                  detail: resultData,
+                  bubbles: true, // Whether the event will bubble up through the DOM or not
+                  cancelable: true, // Whether the event may be canceled or not
+                })
+              );
+
+              const chart = this.root.getElementById('js-doughnut-chart');
+
+              if (null === chart || !(chart instanceof HTMLCanvasElement)) {
+                return;
+              }
+
+              this.updateChart(erwarteteRente, bestehendeVorsorge, rentenluecke);
+
+              const pensionGapAmount = this.root.getElementById('pension-gap-amount');
+              const monthlyRequirementAmount = this.root.getElementById('monthly-requirement-amount');
+              const pensionNetAmount = this.root.getElementById('future-net-pension-amount');
+              const pensionActualAmount = this.root.getElementById('actual-pension-amount');
+
+              if (null !== pensionGapAmount && pensionGapAmount instanceof HTMLOutputElement) {
+                pensionGapAmount.value = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(rentenluecke);
+              }
+
+              if (null !== monthlyRequirementAmount && monthlyRequirementAmount instanceof HTMLOutputElement) {
+                monthlyRequirementAmount.value = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(monatsBedarf);
+              }
+
+              if (null !== pensionNetAmount && pensionNetAmount instanceof HTMLOutputElement && null !== pensionNetAmount.parentElement) {
+                if (erwarteteRente > 0) {
+                  pensionNetAmount.value = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(erwarteteRente);
+                  pensionNetAmount.parentElement.classList.remove('d-none');
+                } else {
+                  pensionNetAmount.parentElement.classList.add('d-none');
+                }
+              }
+
+              if (null !== pensionActualAmount && pensionActualAmount instanceof HTMLOutputElement && null !== pensionActualAmount.parentElement) {
+                if (erwarteteRente > 0) {
+                  pensionActualAmount.value = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(bestehendeVorsorge);
+                  pensionActualAmount.parentElement.classList.remove('d-none');
+                } else {
+                  pensionActualAmount.parentElement.classList.add('d-none');
+                }
+              }
+            }
+          }
+        },
+        false
+      );
+    });
+
+    const fields = this.root.querySelectorAll<HTMLInputElement | HTMLSelectElement>('.needs-validation input, .needs-validation select');
+
+    fields.forEach((field: HTMLInputElement | HTMLSelectElement) => {
+      field.addEventListener(
+        'blur',
+        (event: Event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          field.classList.add('was-edited');
+        },
+        { once: true }
+      );
+    });
+
+    const gebField = this.root.getElementById('geb');
+    const pensionField = this.root.getElementById('rente');
+
+    if (gebField instanceof HTMLInputElement && pensionField instanceof HTMLSelectElement) {
+      gebField.addEventListener(
+        'blur',
+        (): void => {
+          this.checkAge(gebField, pensionField);
+        },
+        false
+      );
+      gebField.addEventListener(
+        'change',
+        (): void => {
+          this.checkAge(gebField, pensionField);
+        },
+        false
+      );
+
+      pensionField.addEventListener(
+        'blur',
+        (): void => {
+          this.checkAge(gebField, pensionField);
+        },
+        false
+      );
+      pensionField.addEventListener(
+        'change',
+        (): void => {
+          this.checkAge(gebField, pensionField);
+        },
+        false
+      );
     }
 
-    connectedCallback() {
-        this.root.innerHTML = this.render();
+    const pensionsAvailableFields = this.root.querySelectorAll<HTMLInputElement>('.js-pensions-available');
+    const pensionsFields = this.root.querySelectorAll<HTMLInputElement>('.pensions-available');
 
-        const forms = this.root.querySelectorAll<HTMLFormElement>('.needs-validation');
-        const vorsorgeLists = this.root.querySelectorAll<VorsorgeList>('vorsorge-list');
+    pensionsAvailableFields.forEach((field: HTMLInputElement): void => {
+      field.addEventListener('change', (event: Event): void => {
+        event.preventDefault();
+        event.stopPropagation();
 
-        let bestehendeVorsorge = 0;
-        let erwarteteRente = 0;
-        let rentenluecke = 0;
+        if ('ja' === field.value) {
+          pensionsFields.forEach((pensionsField: HTMLInputElement): void => {
+            pensionsField.classList.remove('d-none');
+          });
+        }
+        if ('nein' === field.value) {
+          pensionsFields.forEach((pensionsField: HTMLInputElement): void => {
+            pensionsField.classList.add('d-none');
+          });
+        }
+      });
+    });
 
-        vorsorgeLists.forEach((vorsorgeList: VorsorgeList): void => {
-            vorsorgeList.addEventListener('pension.added', (event: CustomEvent<PensionInfo>): void => {
-                bestehendeVorsorge = event.detail.summary;
-            });
-        });
+    const tooltipButtons = this.root.querySelectorAll<HTMLButtonElement>('.has-tooltip button');
 
-        forms.forEach((form: HTMLFormElement): void => {
-            form.addEventListener(
-                'submit',
-                (event: SubmitEvent): void => {
-                    event.preventDefault();
-                    event.stopPropagation();
+    tooltipButtons.forEach((button: HTMLButtonElement): void => {
+      const tooltipName = button.getAttribute('aria-describedby');
 
-                    const valid = form.checkValidity();
+      if (null === tooltipName) {
+        return;
+      }
 
-                    form.classList.add('was-validated');
+      const tooltip = this.root.getElementById(tooltipName);
 
-                    vorsorgeLists.forEach((vorsorgeList: VorsorgeList) => {
-                        vorsorgeList.classList.add('was-validated');
-                    });
+      if (null === tooltip) {
+        return;
+      }
 
-                    if (valid) {
-                        const data: FormData = new FormData(form),
-                            state: FormDataEntryValue | null = data.get('state'),
-                            stkl: FormDataEntryValue | null = data.get('stkl'),
-                            netto: FormDataEntryValue | null = data.get('netto'),
-                            anzahl: FormDataEntryValue | null = data.get('anzahl'),
-                            geb: FormDataEntryValue | null = data.get('geb'),
-                            rente: FormDataEntryValue | null = data.get('rente'),
-                            alter: FormDataEntryValue | null = data.get('alter'),
-                            inflationsrate: FormDataEntryValue | null = data.get('inflationsrate'),
-                            inflationAn: FormDataEntryValue | null = data.get('inflationAn');
+      const popperInstance = createPopper(button, tooltip, {
+        modifiers: [
+          preventOverflow,
+          flip,
+          {
+            name: 'offset',
+            options: {
+              offset: [0, 8],
+            },
+          },
+        ],
+        placement: 'left',
+      });
 
-                        if (null !== state && null !== stkl && null !== netto) {
-                            const calculationResult = Rentenluecke.calculate(
-                                !(state instanceof File) ? state.toString() || '' : '',
-                                !(stkl instanceof File) ? parseInt(stkl.toString(), 10) : 0,
-                                !(netto instanceof File) ? parseInt(netto.toString(), 10) : 0,
-                                !(anzahl instanceof File) ? parseInt((anzahl || 0).toString(), 10) : 0,
-                                !(geb instanceof File) ? parseInt((geb || 0).toString(), 10) : 0,
-                                !(rente instanceof File) ? parseInt((rente || 0).toString(), 10) : 0,
-                                !(alter instanceof File) ? parseInt((alter || 0).toString(), 10) : 0,
-                                !(inflationsrate instanceof File) ? parseFloat((inflationsrate || 0.0).toString()) : 0,
-                                !(inflationAn instanceof File) ? !!(inflationAn || false) : false,
-                                LZZ.LZZ_JAHR,
-                                KRV.KRV_TABELLE_ALLGEMEIN,
-                                true, // kinderlos u. über 23J.
-                                1, // Kirchensteuer berechnen
-                                0.0, // Anzahl Kinderfreibeträge
-                            );
-
-                            if (!calculationResult.valid) {
-                                return;
-                            }
-
-                            const monatsBedarf = calculationResult.monatsBedarf || 0,
-                                monatsRente = calculationResult.monatsRente || 0,
-                                kv = calculationResult.kv || 0,
-                                steuer = calculationResult.steuer || 0;
-
-                            erwarteteRente = calculationResult.nettoRente || 0;
-
-                            let rentenluecke = monatsBedarf - (erwarteteRente + bestehendeVorsorge);
-
-                            if (rentenluecke <= 0) {
-                                rentenluecke = 0;
-                            }
-
-                            const resultData = {
-                                type: 'rentenluecke',
-                                monatsBedarf: monatsBedarf,
-                                monatsRente: monatsRente,
-                                kv: kv,
-                                steuer: steuer,
-                            };
-
-                            document.dispatchEvent(
-                                new CustomEvent('rl.calculated', {
-                                    detail: resultData,
-                                    bubbles: true, // Whether the event will bubble up through the DOM or not
-                                    cancelable: true, // Whether the event may be canceled or not
-                                }),
-                            );
-
-                            const chart = this.root.getElementById('js-doughnut-chart');
-
-                            if (null === chart || !(chart instanceof HTMLCanvasElement)) {
-                                return;
-                            }
-
-                            this.updateChart(erwarteteRente, bestehendeVorsorge, rentenluecke);
-
-                            const pensionGapAmount = this.root.getElementById('pension-gap-amount');
-                            const monthlyRequirementAmount = this.root.getElementById('monthly-requirement-amount');
-                            const pensionNetAmount = this.root.getElementById('future-net-pension-amount');
-                            const pensionActualAmount = this.root.getElementById('actual-pension-amount');
-
-                            if (null !== pensionGapAmount && pensionGapAmount instanceof HTMLOutputElement) {
-                                pensionGapAmount.value = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(rentenluecke);
-                            }
-
-                            if (null !== monthlyRequirementAmount && monthlyRequirementAmount instanceof HTMLOutputElement) {
-                                monthlyRequirementAmount.value = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(monatsBedarf);
-                            }
-
-                            if (null !== pensionNetAmount && pensionNetAmount instanceof HTMLOutputElement && null !== pensionNetAmount.parentElement) {
-                                if (erwarteteRente > 0) {
-                                    pensionNetAmount.value = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(erwarteteRente);
-                                    pensionNetAmount.parentElement.classList.remove('d-none');
-                                } else {
-                                    pensionNetAmount.parentElement.classList.add('d-none');
-                                }
-                            }
-
-                            if (null !== pensionActualAmount && pensionActualAmount instanceof HTMLOutputElement && null !== pensionActualAmount.parentElement) {
-                                if (erwarteteRente > 0) {
-                                    pensionActualAmount.value = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(bestehendeVorsorge);
-                                    pensionActualAmount.parentElement.classList.remove('d-none');
-                                } else {
-                                    pensionActualAmount.parentElement.classList.add('d-none');
-                                }
-                            }
-                        }
-                    }
-                },
-                false,
-            );
-        });
-
-        const fields = this.root.querySelectorAll<HTMLInputElement | HTMLSelectElement>('.needs-validation input, .needs-validation select');
-
-        fields.forEach((field: HTMLInputElement | HTMLSelectElement) => {
-            field.addEventListener(
-                'blur',
-                (event: Event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    field.classList.add('was-edited');
-                },
-                { once: true },
-            );
-        });
-
-        const gebField = this.root.getElementById('geb');
-        const pensionField = this.root.getElementById('rente');
-
-        if (gebField instanceof HTMLInputElement && pensionField instanceof HTMLSelectElement) {
-            gebField.addEventListener(
-                'blur',
-                (): void => {
-                    this.checkAge(gebField, pensionField);
-                },
-                false,
-            );
-            gebField.addEventListener(
-                'change',
-                (): void => {
-                    this.checkAge(gebField, pensionField);
-                },
-                false,
-            );
-
-            pensionField.addEventListener(
-                'blur',
-                (): void => {
-                    this.checkAge(gebField, pensionField);
-                },
-                false,
-            );
-            pensionField.addEventListener(
-                'change',
-                (): void => {
-                    this.checkAge(gebField, pensionField);
-                },
-                false,
-            );
+      function show(): void {
+        if (null === tooltip) {
+          return;
         }
 
-        const pensionsAvailableFields = this.root.querySelectorAll<HTMLInputElement>('.js-pensions-available');
-        const pensionsFields = this.root.querySelectorAll<HTMLInputElement>('.pensions-available');
+        tooltip.setAttribute('data-show', '');
 
-        pensionsAvailableFields.forEach((field: HTMLInputElement): void => {
-            field.addEventListener('change', (event: Event): void => {
-                event.preventDefault();
-                event.stopPropagation();
+        // We need to tell Popper to update the tooltip position
+        // after we show the tooltip, otherwise it will be incorrect
+        void popperInstance.update();
+      }
 
-                if ('ja' === field.value) {
-                    pensionsFields.forEach((pensionsField: HTMLInputElement): void => {
-                        pensionsField.classList.remove('d-none');
-                    });
-                }
-                if ('nein' === field.value) {
-                    pensionsFields.forEach((pensionsField: HTMLInputElement): void => {
-                        pensionsField.classList.add('d-none');
-                    });
-                }
-            });
-        });
-
-        const tooltipButtons = this.root.querySelectorAll<HTMLButtonElement>('.has-tooltip button');
-
-        tooltipButtons.forEach((button: HTMLButtonElement): void => {
-            const tooltipName = button.getAttribute('aria-describedby');
-
-            if (null === tooltipName) {
-                return;
-            }
-
-            const tooltip = this.root.getElementById(tooltipName);
-
-            if (null === tooltip) {
-                return;
-            }
-
-            const popperInstance = createPopper(button, tooltip, {
-                modifiers: [
-                    preventOverflow,
-                    flip,
-                    {
-                        name: 'offset',
-                        options: {
-                            offset: [0, 8],
-                        },
-                    },
-                ],
-                placement: 'left',
-            });
-
-            function show(): void {
-                if (null === tooltip) {
-                    return;
-                }
-
-                tooltip.setAttribute('data-show', '');
-
-                // We need to tell Popper to update the tooltip position
-                // after we show the tooltip, otherwise it will be incorrect
-                void popperInstance.update();
-            }
-
-            function hide(): void {
-                if (null === tooltip) {
-                    return;
-                }
-
-                tooltip.removeAttribute('data-show');
-            }
-
-            const showEvents = ['mouseenter', 'focus'];
-            const hideEvents = ['mouseleave', 'blur'];
-
-            showEvents.forEach((event: string): void => {
-                button.addEventListener(event, show);
-            });
-
-            hideEvents.forEach((event: string): void => {
-                button.addEventListener(event, hide);
-            });
-        });
-
-        const inflationAn = this.root.getElementById('inflationAn');
-        const inflationsRate = this.root.getElementById('inflationsrate');
-        const inflationsButtons = this.root.querySelectorAll<HTMLButtonElement>('.inflation-settings');
-
-        if (null !== inflationAn && null !== inflationsRate && inflationAn instanceof HTMLInputElement && inflationsRate instanceof HTMLInputElement) {
-            inflationAn.addEventListener(
-                'change',
-                (event: Event): void => {
-                    if (null === event.target || !(event.target instanceof HTMLInputElement) || !(inflationsRate instanceof HTMLInputElement)) {
-                        return;
-                    }
-
-                    if (event.target.checked) {
-                        inflationsButtons.forEach((button: HTMLButtonElement): void => {
-                            button.removeAttribute('disabled');
-                        });
-                    } else {
-                        inflationsButtons.forEach((button: HTMLButtonElement): void => {
-                            button.setAttribute('disabled', '');
-                        });
-
-                        inflationsRate.value = '2.2';
-                        inflationsRate.dispatchEvent(
-                            new InputEvent('input', {
-                                bubbles: false, // Whether the event will bubble up through the DOM or not
-                                cancelable: true, // Whether the event may be canceled or not
-                            }),
-                        );
-                    }
-
-                    forms.forEach((form: HTMLFormElement): void => {
-                        form.dispatchEvent(
-                            new SubmitEvent('submit', {
-                                bubbles: false, // Whether the event will bubble up through the DOM or not
-                                cancelable: true, // Whether the event may be canceled or not
-                            }),
-                        );
-                    });
-                },
-                false,
-            );
+      function hide(): void {
+        if (null === tooltip) {
+          return;
         }
 
-        const layer = this.root.getElementById('inflation-layer');
+        tooltip.removeAttribute('data-show');
+      }
 
-        inflationsButtons.forEach((button: HTMLButtonElement): void => {
-            if (null === layer || !(layer instanceof HTMLDialogElement)) {
-                return;
-            }
+      const showEvents = ['mouseenter', 'focus'];
+      const hideEvents = ['mouseleave', 'blur'];
 
-            button.addEventListener(
-                'click',
-                (event: MouseEvent): void => {
-                    event.preventDefault();
-                    event.stopPropagation();
+      showEvents.forEach((event: string): void => {
+        button.addEventListener(event, show);
+      });
 
-                    this.slider();
+      hideEvents.forEach((event: string): void => {
+        button.addEventListener(event, hide);
+      });
+    });
 
-                    layer.showModal();
-                    layer.setAttribute('aria-hidden', 'false');
-                },
-                false,
-            );
-        });
+    const inflationAn = this.root.getElementById('inflationAn');
+    const inflationsRate = this.root.getElementById('inflationsrate');
+    const inflationsButtons = this.root.querySelectorAll<HTMLButtonElement>('.inflation-settings');
 
-        if (null !== inflationsRate && inflationsRate instanceof HTMLInputElement) {
-            const sliderTooltips = this.root.querySelectorAll<HTMLOutputElement>('.slider-tooltip');
-            const sliderRate = this.root.querySelectorAll<HTMLOutputElement>('.inflation-rate');
-
-            inflationsRate.addEventListener(
-                'input',
-                (event: Event): void => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    sliderTooltips.forEach((sliderTooltip: HTMLOutputElement): void => {
-                        sliderTooltip.value = inflationsRate.value + '%';
-                    });
-                    sliderRate.forEach((sliderTooltip: HTMLOutputElement): void => {
-                        sliderTooltip.value = inflationsRate.value + '%';
-                    });
-
-                    console.log('slider');
-
-                    this.slider();
-                },
-                false,
-            );
-        }
-
-        const modalCloseButtons = this.root.querySelectorAll<HTMLButtonElement>('.btn-close');
-
-        modalCloseButtons.forEach((modalCloseButton: HTMLButtonElement): void => {
-            if (null === layer || !(layer instanceof HTMLDialogElement)) {
-                return;
-            }
-
-            modalCloseButton.addEventListener(
-                'click',
-                (event: MouseEvent): void => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    layer.close();
-                    layer.setAttribute('aria-hidden', 'true');
-
-                    forms.forEach((form: HTMLFormElement): void => {
-                        form.dispatchEvent(
-                            new SubmitEvent('submit', {
-                                bubbles: false, // Whether the event will bubble up through the DOM or not
-                                cancelable: true, // Whether the event may be canceled or not
-                            }),
-                        );
-                    });
-                },
-                false,
-            );
-        });
-
-        const chart = this.root.getElementById('js-doughnut-chart');
-
-        if (null === chart || !(chart instanceof HTMLCanvasElement)) {
+    if (null !== inflationAn && null !== inflationsRate && inflationAn instanceof HTMLInputElement && inflationsRate instanceof HTMLInputElement) {
+      inflationAn.addEventListener(
+        'change',
+        (event: Event): void => {
+          if (null === event.target || !(event.target instanceof HTMLInputElement) || !(inflationsRate instanceof HTMLInputElement)) {
             return;
-        }
+          }
 
-        if (null === this.chartObject) {
-            this.chartObject = new Chart<'doughnut'>(chart, {
-                type: 'doughnut',
-                options: {
-                    locale: 'de-DE',
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    // cutoutPercentage: 93,
-                    plugins: {
-                        legend: {
-                            display: false,
-                        },
-                        title: {
-                            display: true,
-                            align: 'center',
-                            position: 'bottom',
-                            text: `Rentenlücke: ${new Intl.NumberFormat('de-DE', {
-                                style: 'currency',
-                                currency: 'EUR',
-                            }).format(rentenluecke)}`,
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context: TooltipItem<'doughnut'>): string {
-                                    let label = context.dataset.label || '';
+          if (event.target.checked) {
+            inflationsButtons.forEach((button: HTMLButtonElement): void => {
+              button.removeAttribute('disabled');
+            });
+          } else {
+            inflationsButtons.forEach((button: HTMLButtonElement): void => {
+              button.setAttribute('disabled', '');
+            });
 
-                                    if (context.parsed !== null) {
-                                        if (label) {
-                                            label += ': ';
-                                        }
+            inflationsRate.value = '2.2';
+            inflationsRate.dispatchEvent(
+              new InputEvent('input', {
+                bubbles: false, // Whether the event will bubble up through the DOM or not
+                cancelable: true, // Whether the event may be canceled or not
+              })
+            );
+          }
 
-                                        label += new Intl.NumberFormat('de-DE', {
-                                            style: 'currency',
-                                            currency: 'EUR',
-                                        }).format(context.parsed);
-                                    }
+          forms.forEach((form: HTMLFormElement): void => {
+            form.dispatchEvent(
+              new SubmitEvent('submit', {
+                bubbles: false, // Whether the event will bubble up through the DOM or not
+                cancelable: true, // Whether the event may be canceled or not
+              })
+            );
+          });
+        },
+        false
+      );
+    }
 
-                                    return label;
-                                },
-                            },
-                        },
-                    },
+    const layer = this.root.getElementById('inflation-layer');
+
+    inflationsButtons.forEach((button: HTMLButtonElement): void => {
+      if (null === layer || !(layer instanceof HTMLDialogElement)) {
+        return;
+      }
+
+      button.addEventListener(
+        'click',
+        (event: MouseEvent): void => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          this.slider();
+
+          layer.showModal();
+          layer.setAttribute('aria-hidden', 'false');
+        },
+        false
+      );
+    });
+
+    if (null !== inflationsRate && inflationsRate instanceof HTMLInputElement) {
+      const sliderTooltips = this.root.querySelectorAll<HTMLOutputElement>('.slider-tooltip');
+      const sliderRate = this.root.querySelectorAll<HTMLOutputElement>('.inflation-rate');
+
+      inflationsRate.addEventListener(
+        'input',
+        (event: Event): void => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          sliderTooltips.forEach((sliderTooltip: HTMLOutputElement): void => {
+            sliderTooltip.value = inflationsRate.value + '%';
+          });
+          sliderRate.forEach((sliderTooltip: HTMLOutputElement): void => {
+            sliderTooltip.value = inflationsRate.value + '%';
+          });
+
+          console.log('slider');
+
+          this.slider();
+        },
+        false
+      );
+    }
+
+    const modalCloseButtons = this.root.querySelectorAll<HTMLButtonElement>('.btn-close');
+
+    modalCloseButtons.forEach((modalCloseButton: HTMLButtonElement): void => {
+      if (null === layer || !(layer instanceof HTMLDialogElement)) {
+        return;
+      }
+
+      modalCloseButton.addEventListener(
+        'click',
+        (event: MouseEvent): void => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          layer.close();
+          layer.setAttribute('aria-hidden', 'true');
+
+          forms.forEach((form: HTMLFormElement): void => {
+            form.dispatchEvent(
+              new SubmitEvent('submit', {
+                bubbles: false, // Whether the event will bubble up through the DOM or not
+                cancelable: true, // Whether the event may be canceled or not
+              })
+            );
+          });
+        },
+        false
+      );
+    });
+
+    const chart = this.root.getElementById('js-doughnut-chart');
+
+    if (null === chart || !(chart instanceof HTMLCanvasElement)) {
+      return;
+    }
+
+    if (null === this.chartObject) {
+      this.chartObject = new Chart<'doughnut'>(chart, {
+        type: 'doughnut',
+        options: {
+          locale: 'de-DE',
+          responsive: true,
+          maintainAspectRatio: true,
+          // cutoutPercentage: 93,
+          plugins: {
+            legend: {
+              display: false,
+            },
+            title: {
+              display: true,
+              align: 'center',
+              position: 'bottom',
+              text: `Rentenlücke: ${new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'EUR',
+              }).format(rentenluecke)}`,
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context: TooltipItem<'doughnut'>): string {
+                  let label = context.dataset.label || '';
+
+                  if (context.parsed !== null) {
+                    if (label) {
+                      label += ': ';
+                    }
+
+                    label += new Intl.NumberFormat('de-DE', {
+                      style: 'currency',
+                      currency: 'EUR',
+                    }).format(context.parsed);
+                  }
+
+                  return label;
                 },
-                data: {
-                    labels: ['zu erwartende Nettorente', 'bestehende Vorsorge', 'Rentenlücke'],
-                    datasets: [
-                        {
-                            data: [erwarteteRente, bestehendeVorsorge, rentenluecke],
-                            backgroundColor: ['#2cc1d5', '#005e97', '#ff1f00'],
-                            borderColor: ['#ffffff', '#888888', '#000000'],
-                            borderWidth: 0,
-                            borderAlign: 'inner',
-                            weight: 0.1,
-                        },
-                    ],
-                },
-            });
-        } else {
-            this.updateChart(erwarteteRente, bestehendeVorsorge, rentenluecke);
-        }
+              },
+            },
+          },
+        },
+        data: {
+          labels: ['zu erwartende Nettorente', 'bestehende Vorsorge', 'Rentenlücke'],
+          datasets: [
+            {
+              data: [erwarteteRente, bestehendeVorsorge, rentenluecke],
+              backgroundColor: ['#2cc1d5', '#005e97', '#ff1f00'],
+              borderColor: ['#ffffff', '#888888', '#000000'],
+              borderWidth: 0,
+              borderAlign: 'inner',
+              weight: 0.1,
+            },
+          ],
+        },
+      });
+    } else {
+      this.updateChart(erwarteteRente, bestehendeVorsorge, rentenluecke);
+    }
+  }
+
+  attributeChangedCallback(/*attrName: string, oldVal: string, newVal: string/**/): void {
+    // nothing to do at the moment
+    console.log('attributeChangedCallback hook');
+  }
+
+  diconnectedCallback(): void {
+    // nothing to do at the moment
+    console.log('diconnectedCallback hook');
+  }
+
+  static get observedAttributes(): string[] {
+    return ['class'];
+  }
+
+  get class(): string | null {
+    return this.getAttribute('class');
+  }
+
+  set class(classVal: string | null) {
+    if (classVal) {
+      this.setAttribute('class', classVal);
+    } else {
+      this.setAttribute('class', '');
+    }
+  }
+
+  checkAge(gebField: HTMLInputElement, pensionField: HTMLSelectElement): void {
+    const Datum = new Date(),
+      actualYear = Datum.getUTCFullYear(),
+      invalidAgeMessages = this.root.querySelectorAll<HTMLDivElement>('.invalid-age-feedback');
+
+    if ('' === gebField.value || '' === pensionField.value) {
+      invalidAgeMessages.forEach((invalidAgeMessage: HTMLDivElement): void => {
+        invalidAgeMessage.style.display = 'none';
+      });
+      return;
     }
 
-    attributeChangedCallback(/*attrName: string, oldVal: string, newVal: string/**/): void {
-        // nothing to do at the moment
-        console.log('attributeChangedCallback hook');
+    const birthyear = parseInt(gebField.value, 10),
+      pensionAge = parseInt(pensionField.value, 10);
+
+    gebField.setAttribute('min', (actualYear - 1 - pensionAge).toString());
+    gebField.checkValidity();
+
+    if (birthyear + pensionAge >= actualYear - 1) {
+      invalidAgeMessages.forEach((invalidAgeMessage: HTMLDivElement): void => {
+        invalidAgeMessage.style.display = 'none';
+      });
+
+      return;
     }
 
-    diconnectedCallback(): void {
-        // nothing to do at the moment
-        console.log('diconnectedCallback hook');
-    }
+    invalidAgeMessages.forEach((invalidAgeMessage: HTMLDivElement): void => {
+      invalidAgeMessage.style.display = 'block';
+    });
+  }
 
-    static get observedAttributes(): string[] {
-        return ['class'];
-    }
-
-    get class(): string | null {
-        return this.getAttribute('class');
-    }
-
-    set class(classVal: string | null) {
-        if (classVal) {
-            this.setAttribute('class', classVal);
-        } else {
-            this.setAttribute('class', '');
-        }
-    }
-
-    checkAge(gebField: HTMLInputElement, pensionField: HTMLSelectElement): void {
-        const Datum = new Date(),
-            actualYear = Datum.getUTCFullYear(),
-            invalidAgeMessages = this.root.querySelectorAll<HTMLDivElement>('.invalid-age-feedback');
-
-        if ('' === gebField.value || '' === pensionField.value) {
-            invalidAgeMessages.forEach((invalidAgeMessage: HTMLDivElement): void => {
-                invalidAgeMessage.style.display = 'none';
-            });
-            return;
-        }
-
-        const birthyear = parseInt(gebField.value, 10),
-            pensionAge = parseInt(pensionField.value, 10);
-
-        gebField.setAttribute('min', (actualYear - 1 - pensionAge).toString());
-        gebField.checkValidity();
-
-        if (birthyear + pensionAge >= actualYear - 1) {
-            invalidAgeMessages.forEach((invalidAgeMessage: HTMLDivElement): void => {
-                invalidAgeMessage.style.display = 'none';
-            });
-
-            return;
-        }
-
-        invalidAgeMessages.forEach((invalidAgeMessage: HTMLDivElement): void => {
-            invalidAgeMessage.style.display = 'block';
-        });
-    }
-
-    getStyle(): string {
-        return `
+  getStyle(): string {
+    return `
     <style>
         @layer all, media, container;
 
@@ -1113,11 +1113,11 @@ class RL extends HTMLElement {
         }
     </style>
     `;
-    }
+  }
 
-    render(): string {
-        const Datum = new Date();
-        return `
+  render(): string {
+    const Datum = new Date();
+    return `
       ${this.getStyle()}
       <div class="container">
         <div class="headline">
@@ -1364,51 +1364,51 @@ class RL extends HTMLElement {
         </div>
       </div>
     `;
+  }
+
+  updateChart(erwarteteRente: number, bestehendeVorsorge: number, rentenluecke: number): void {
+    if (null === this.chartObject) {
+      return;
     }
 
-    updateChart(erwarteteRente: number, bestehendeVorsorge: number, rentenluecke: number): void {
-        if (null === this.chartObject) {
-            return;
-        }
+    this.chartObject.data.datasets[0].data = [erwarteteRente, bestehendeVorsorge, rentenluecke];
 
-        this.chartObject.data.datasets[0].data = [erwarteteRente, bestehendeVorsorge, rentenluecke];
-
-        if (this.chartObject.options.plugins && this.chartObject.options.plugins.title) {
-            this.chartObject.options.plugins.title.text = `Rentenlücke: ${new Intl.NumberFormat('de-DE', {
-                style: 'currency',
-                currency: 'EUR',
-            }).format(rentenluecke)}`;
-        }
-
-        this.chartObject.update();
+    if (this.chartObject.options.plugins && this.chartObject.options.plugins.title) {
+      this.chartObject.options.plugins.title.text = `Rentenlücke: ${new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR',
+      }).format(rentenluecke)}`;
     }
 
-    slider(): void {
-        const sliderTooltips = this.root.querySelectorAll<HTMLOutputElement>('.slider-tooltip');
+    this.chartObject.update();
+  }
 
-        if (sliderTooltips.length === 0) {
-            return;
-        }
+  slider(): void {
+    const sliderTooltips = this.root.querySelectorAll<HTMLOutputElement>('.slider-tooltip');
 
-        const sliders = this.root.querySelectorAll<HTMLInputElement>('.js-tooltip-slider');
-
-        sliders.forEach((slider: HTMLInputElement): void => {
-            const sliderValue = parseFloat(slider.value),
-                sliderMax = parseFloat(slider.max),
-                sliderMin = parseFloat(slider.min);
-
-            if (isNaN(sliderValue)) {
-                slider.value = '0';
-            }
-
-            const sliderTooltip = sliderTooltips[0],
-                value = ((sliderValue - sliderMin) * 100) / (sliderMax - sliderMin),
-                percentOfRange = isNaN(value) ? 0 : value,
-                newPosition = -18 - (15 * percentOfRange) / 100;
-
-            sliderTooltip.style.left = `calc(${percentOfRange}% + (${newPosition}px))`;
-        });
+    if (sliderTooltips.length === 0) {
+      return;
     }
+
+    const sliders = this.root.querySelectorAll<HTMLInputElement>('.js-tooltip-slider');
+
+    sliders.forEach((slider: HTMLInputElement): void => {
+      const sliderValue = parseFloat(slider.value),
+        sliderMax = parseFloat(slider.max),
+        sliderMin = parseFloat(slider.min);
+
+      if (isNaN(sliderValue)) {
+        slider.value = '0';
+      }
+
+      const sliderTooltip = sliderTooltips[0],
+        value = ((sliderValue - sliderMin) * 100) / (sliderMax - sliderMin),
+        percentOfRange = isNaN(value) ? 0 : value,
+        newPosition = -18 - (15 * percentOfRange) / 100;
+
+      sliderTooltip.style.left = `calc(${percentOfRange}% + (${newPosition}px))`;
+    });
+  }
 }
 
 export default RL;

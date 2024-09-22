@@ -13,7 +13,7 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
-[*.{js,cjs,mjs,cts,ts,json,json5,yml,scss}]
+[*.{js,ts,cjs,cts,mjs,mts,json,json5,yaml,yml,neon}]
 indent_size = 2
 
 [test/fixture-data/*.json]

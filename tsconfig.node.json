@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true
+  },
+  "extends": "./tsconfig.json",
+  "include": ["vite.config.ts", "postcss.config.mjs", "stylelint.config.mjs", "prettier.config.mjs", "cypress.config.ts"]
+}

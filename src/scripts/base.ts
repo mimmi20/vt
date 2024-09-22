@@ -132,15 +132,18 @@ export function validate(elementNative: HTMLInputElement | HTMLTextAreaElement |
  * @returns {*}
  */
 export function camelize(str: string): string {
-  let separator = '-',
-    match = str.indexOf(separator);
+  const separator = '-';
+  let match = str.indexOf(separator);
+
   while (match !== -1) {
     const last = match === str.length - 1,
       next = last ? '' : str[match + 1],
       upnext = next.toUpperCase(),
       sepSubstr = last ? separator : separator + next;
+
     str = str.replace(sepSubstr, upnext);
     match = str.indexOf(separator);
   }
+
   return str;
 }

@@ -53,10 +53,11 @@ export default tseslint.config(
   {
     ignores: [
       'src/**/*.d.ts',
+      'src/**/*.js',
+      'public/**/*.{js,mjs,cjs,ts}',
       'src/js/vendor/*.{js,mjs,cjs,ts}',
       'src/js/vendor/**/*.{js,mjs,cjs,ts}',
       'src/dist/**/*.{js,mjs,cjs,ts}',
-      'src/js/**/*.js',
       'node_modules/**/*.{js,mjs,cjs,ts}',
       'vendor-bin/**/*.{js,mjs,cjs,ts}',
       'vendor/**/*.{js,mjs,cjs,ts}',

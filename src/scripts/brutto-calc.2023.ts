@@ -58,8 +58,9 @@ export default class BruttoCalculation {
       bbgkvpv: number,
       kvz: number,
       minbrutto = 0,
-      pvs = 0,
-      pkv = this.baseCalc.PKV_GES;
+      pvs = 0;
+
+    const pkv = this.baseCalc.PKV_GES;
 
     if (state === STATES.BUNDESLAND_SN) {
       pvs = 1;

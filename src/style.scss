@@ -1,28 +1,28 @@
 :root {
+  background-color: #242424;
+  color: rgba(255, 255, 255, 0.87);
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  line-height: 24px;
+  text-rendering: optimizeLegibility;
+  color-scheme: light dark;
+  font-synthesis: none;
   text-size-adjust: 100%;
 }
 
 body {
-  margin: 0;
   display: grid;
+  min-block-size: 100vb;
+  min-inline-size: 320px;
+  margin: 0;
   place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
 }
 
 #app {
-  max-width: 1280px;
+  max-inline-size: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -30,23 +30,23 @@ body {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
     background-color: #fff;
+    color: #213547;
   }
 }
 
 vt-rl {
   --vt-helptext-color: #aaa;
   --vt-helptext-fontsize: .8em;
-  --vt-optional-message-color: green;
+  --vt-optional-message-color: #008000;
   --vt-danger-text-color: #000;
-  --vt-danger-message-color: red;
-  --vt-danger-background-color: red;
-  --vt-danger-border-color: red;
+  --vt-danger-message-color: #f00;
+  --vt-danger-background-color: #f00;
+  --vt-danger-border-color: #f00;
   --vt-warning-text-color: #000;
-  --vt-warning-background-color: orange;
-  --vt-warning-border-color: orange;
-  --vt-alert-border-color: pink;
+  --vt-warning-background-color: #FFA500;
+  --vt-warning-border-color: #FFA500;
+  --vt-alert-border-color: #FFC0CB;
   --vt-background-color: #fff;
   --vt-button-color: #fff;
   --vt-button-background-color: #000;
@@ -55,7 +55,7 @@ vt-rl {
   --vt-form-border-radius: 0.25rem;
   --vt-form-border-width: 2px;
   --vt-form-border-color: #ced4da;
-  --vt-form-valid-color: green;
-  --vt-form-invalid-color: red;
+  --vt-form-valid-color: #008000;
+  --vt-form-invalid-color: #f00;
   --vt-form-color: #000;
 }

@@ -64,11 +64,7 @@ jobs:
 
         node-version:
           - "20"
-          - "22.0"
-          - "22.1"
-          - "22.2"
-          - "22.3"
-          - "22.4"
+          - "22"
 
     steps:
       - name: "Checkout"
@@ -175,7 +171,7 @@ jobs:
 
         node-version:
           - "20"
-          - "22.5"
+          - "22"
 
     steps:
       - name: "Checkout"
@@ -220,7 +216,7 @@ jobs:
 
         node-version:
           - "20"
-          - "22.5"
+          - "22"
 
     steps:
       - name: "Checkout"

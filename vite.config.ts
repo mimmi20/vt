@@ -1,7 +1,4 @@
 import { defineConfig } from 'vitest/config';
-import stylelint from 'vite-plugin-stylelint';
-import { resolveToEsbuildTarget } from 'esbuild-plugin-browserslist';
-import browserslist from 'browserslist';
 import viteImagemin from '@vheemstra/vite-plugin-imagemin';
 import imageminJpegtran from '@yeanzhi/imagemin-jpegtran';
 import imageminPngquant from '@localnerve/imagemin-pngquant';
@@ -10,17 +7,19 @@ import imageminWebp from '@yeanzhi/imagemin-webp';
 import imageminGifToWebp from 'imagemin-gif2webp';
 import imageminAviv from '@vheemstra/imagemin-avifenc';
 import imageminSvgo from '@koddsson/imagemin-svgo';
+import { resolveToEsbuildTarget } from 'esbuild-plugin-browserslist';
+import browserslist from 'browserslist';
 
 const target = resolveToEsbuildTarget(browserslist('defaults'), {
   printUnknownTargets: false,
 });
 
 export default defineConfig({
+  appType: 'custom',
   root: __dirname,
   publicDir: 'public',
   base: '/dist/',
   plugins: [
-    stylelint(),
     viteImagemin({
       plugins: {
         jpg: imageminJpegtran(),
@@ -54,6 +53,16 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    host: 'localhost',
+    port: 8080,
+    strictPort: true,
+    hmr: {
+      host: 'localhost',
+      clientPort: 8080,
+    },
+    origin: 'http://localhost:8080',
+  },
   build: {
     target: target,
     outDir: 'public/dist', // relative to the `root` folder
@@ -70,16 +79,15 @@ export default defineConfig({
   css: {
     devSourcemap: true,
     transformer: 'postcss',
-  },
-  server: {
-    host: 'localhost',
-    port: 8080,
-    strictPort: true,
-    hmr: {
-      host: 'localhost',
-      clientPort: 8080,
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+        outputStyle: 'expanded',
+        alertAscii: true,
+        alertColor: true,
+        verbose: true,
+      },
     },
-    origin: 'http://localhost:8080',
   },
   test: {
     include: ['test/**/*.test.ts'],

@@ -1,4 +1,7 @@
 /** @type {import('stylelint').Config} */
+
+import sortOrderSmacss from 'stylelint-config-property-sort-order-smacss/generate.js';
+
 export default {
   extends: ['stylelint-config-standard-scss', 'stylelint-config-property-sort-order-smacss'],
   plugins: ['stylelint-plugin-logical-css', 'stylelint-declaration-block-no-ignored-properties', 'stylelint-use-nesting'],
@@ -17,14 +20,14 @@ export default {
     'scss/operator-no-unspaced': null,
 
     // rules for logical properties and values
-    'plugin/use-logical-properties-and-values': null, // maybe later
-    'plugin/use-logical-units': null, // maybe later
+    'plugin/use-logical-properties-and-values': true,
+    'plugin/use-logical-units': true,
 
     'plugin/declaration-block-no-ignored-properties': true,
 
     'csstools/use-nesting': ['always', { syntax: 'scss', severity: 'warning', disableFix: true }],
 
-    //'order/properties-order': [true, { severity: 'warning', disableFix: true }],
+    'order/properties-order': [sortOrderSmacss(), { severity: 'warning' }],
 
     // general rules
     'alpha-value-notation': null, // maybe later -> 'percentage',
@@ -40,7 +43,7 @@ export default {
     'declaration-empty-line-before': 'never',
     'font-family-name-quotes': 'always-where-recommended',
     'font-family-no-missing-generic-family-keyword': true,
-    'function-name-case': 'lower',
+    'function-name-case': ['lower', { severity: 'warning' }],
     'function-url-quotes': 'always',
     'length-zero-no-unit': true,
     'media-feature-range-notation': 'prefix',
@@ -57,6 +60,7 @@ export default {
     'selector-max-compound-selectors': null, // maybe later -> [3, { severity: 'warning' }],
     'selector-not-notation': 'simple',
     'selector-pseudo-element-colon-notation': 'single',
+    'selector-type-case': ['lower', { severity: 'warning' }],
     'shorthand-property-no-redundant-values': true,
     'value-keyword-case': ['lower', { ignoreKeywords: ['currentColor', 'optimizeLegibility'], severity: 'warning', disableFix: true }],
     'value-no-vendor-prefix': true,
@@ -64,5 +68,5 @@ export default {
   reportDescriptionlessDisables: true,
   reportInvalidScopeDisables: true,
   reportNeedlessDisables: true,
-  quietDeprecationWarnings: true,
+  quietDeprecationWarnings: false,
 };

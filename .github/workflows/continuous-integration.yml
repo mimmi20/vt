@@ -25,9 +25,12 @@ jobs:
       ini-values: "opcache.enable=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
       composer-options: "--optimize-autoloader --prefer-dist --prefer-stable -v"
       skip-validate-composer: true
+      skip-validate-yaml: false
+      skip-validate-md: false
       skip-phplint: true
       skip-check-composer: true
       skip-ec-checker: true
+      dependency-analyser-options: ""
 
   install:
     name: "Install Project"
@@ -64,11 +67,7 @@ jobs:
 
         node-version:
           - "20"
-          - "22.0"
-          - "22.1"
-          - "22.2"
-          - "22.3"
-          - "22.4"
+          - "22"
 
     steps:
       - name: "Checkout"
@@ -175,7 +174,7 @@ jobs:
 
         node-version:
           - "20"
-          - "22.5"
+          - "22"
 
     steps:
       - name: "Checkout"
@@ -220,7 +219,7 @@ jobs:
 
         node-version:
           - "20"
-          - "22.5"
+          - "22"
 
     steps:
       - name: "Checkout"

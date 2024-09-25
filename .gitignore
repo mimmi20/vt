@@ -34,6 +34,7 @@ package-lock.json
 *.txt
 junit-report.xml
 /src/**/*.js
+/src/*.js
 /src/**/*.map
 /src/**/*.d.ts
 /cypress/**/*.js

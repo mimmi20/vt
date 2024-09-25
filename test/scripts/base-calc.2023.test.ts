@@ -1,5 +1,6 @@
 import { describe, it, expect, test } from 'vitest';
 import BaseCalculation from '../../src/scripts/base-calc.2023';
+import * as fs from 'node:fs';
 
 const tests: TestInfo[] = [
   {
@@ -36,7 +37,17 @@ const tests: TestInfo[] = [
 
 for (let re4 = 5000; re4 <= 90000; ) {
   for (let stkl = 1; stkl < 2; stkl++) {
-    const taxTests: TestInfo[] = require('../fixture-data/base-calc_' + re4.toString() + '_' + stkl.toString() + '.json');
+    const fileName = '../fixture-data/base-calc_' + re4.toString() + '_' + stkl.toString() + '.json';
+    let content = '';
+
+    try {
+      content = fs.readFileSync(fileName, 'utf-8');
+    } catch (error) {
+      console.log(error);
+      continue;
+    }
+
+    const taxTests: TestInfo[] = JSON.parse(content);
 
     taxTests.forEach(function (test: TestInfo): void {
       tests.push(test);

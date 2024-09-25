@@ -37,7 +37,17 @@ const tests: TestInfo[] = [
 
 for (let re4 = 5000; re4 <= 90000; ) {
   for (let stkl = 1; stkl < 2; stkl++) {
-    const taxTests: TestInfo[] = JSON.parse(fs.readFileSync('../fixture-data/base-calc_' + re4.toString() + '_' + stkl.toString() + '.json', 'utf-8'));
+    const fileName = '../fixture-data/base-calc_' + re4.toString() + '_' + stkl.toString() + '.json';
+    let content = '';
+
+    try {
+      content = fs.readFileSync(fileName, 'utf-8');
+    } catch (error) {
+      console.log(error);
+      continue;
+    }
+
+    const taxTests: TestInfo[] = JSON.parse(content);
 
     taxTests.forEach(function (test: TestInfo): void {
       tests.push(test);

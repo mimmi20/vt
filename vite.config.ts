@@ -82,6 +82,10 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         api: 'modern-compiler',
+        outputStyle: 'expanded',
+        alertAscii: true,
+        alertColor: true,
+        verbose: true,
       },
     },
   },

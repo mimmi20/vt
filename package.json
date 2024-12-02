@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "chart.js": "^4.4.6",
+    "chart.js": "^4.4.7",
     "fe-tools": "github:mimmi20/fe-tools#master"
   },
   "devDependencies": {
@@ -110,7 +110,7 @@
     "supports-color": "^7.2.0 || ^9.0.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.17.0",
-    "vite": "^5.4.11",
+    "vite": "^6.0.2",
     "vite-plugin-dts": "^4.3.0",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-stylelint": "^6.0.0",

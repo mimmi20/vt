@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "chart.js": "^4.4.6",
+    "chart.js": "^4.4.7",
     "fe-tools": "github:mimmi20/fe-tools#master"
   },
   "devDependencies": {

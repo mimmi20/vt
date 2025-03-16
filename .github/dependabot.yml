@@ -10,8 +10,7 @@ updates:
     directory: "/"
 
     schedule:
-      interval: "weekly"
-      day: "sunday"
+      interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
 
@@ -41,8 +40,7 @@ updates:
     directory: "/"
 
     schedule:
-      interval: "weekly"
-      day: "sunday"
+      interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
 

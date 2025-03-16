@@ -34,8 +34,7 @@ updates:
       include: "scope"
       prefix: "npm"
 
-    # Disable rebasing for all pull requests
-    rebase-strategy: "disabled"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "github-actions"
 
@@ -67,5 +66,4 @@ updates:
       - dependency-name: "mimmi20/ci"
       - dependency-name: "release-drafter/release-drafter"
 
-    # Disable rebasing for all pull requests
-    rebase-strategy: "disabled"
+    rebase-strategy: "auto"

@@ -15,6 +15,27 @@ const target = resolveToEsbuildTarget(browserslist('defaults'), {
   printUnknownTargets: false,
 });
 
+const SvgoOpts = {
+  multipass: true,
+  plugins: [
+    {
+      name: 'preset-default',
+      params: {
+        overrides: {
+          removeViewBox: false,
+          removeComments: true,
+          cleanupNumericValues: {
+            floatPrecision: 2,
+          },
+          convertColors: {
+            shortname: false,
+          },
+        },
+      },
+    },
+  ],
+};
+
 export default defineConfig({
   appType: 'custom',
   root: __dirname,
@@ -25,23 +46,19 @@ export default defineConfig({
       plugins: {
         jpg: imageminJpegtran(),
         png: imageminPngquant({
-          quality: [0.6, 0.8],
+          quality: [0.8, 1],
         }),
         gif: imageminGif(),
-        svg: imageminSvgo({
-          plugins: [
-            {
-              name: 'removeViewBox',
-              active: false,
-            },
-          ],
-        }),
+        svg: imageminSvgo(SvgoOpts),
       },
       onlyAssets: true,
+      skipIfLarger: true,
+      clearCache: true,
       makeWebp: {
         plugins: {
           jpg: imageminWebp({ quality: 100 }),
-          gif: imageminGifToWebp(),
+          png: imageminWebp({ quality: 100 }),
+          gif: imageminGifToWebp({ quality: 82 }),
         },
         skipIfLargerThan: 'optimized',
       },
@@ -53,8 +70,8 @@ export default defineConfig({
         skipIfLargerThan: 'optimized',
       },
     }),
-    compression({ deleteOriginalAssets: false, skipIfLargerOrEqual: true, algorithm: 'gzip', include: /\.(html|css|js|cjs|mjs|svg|woff|woff2|json)$/ }),
-    compression({ deleteOriginalAssets: false, skipIfLargerOrEqual: true, algorithm: 'brotliCompress', include: /\.(html|css|js|cjs|mjs|svg|woff|woff2|json)$/ }),
+    compression({ deleteOriginalAssets: false, skipIfLargerOrEqual: true, algorithm: 'gzip', include: /\.(html|css|js|cjs|mjs|svg|woff|woff2|json|jpeg|jpg|gif|png|webp|avif)$/ }),
+    compression({ deleteOriginalAssets: false, skipIfLargerOrEqual: true, algorithm: 'brotliCompress', include: /\.(html|css|js|cjs|mjs|svg|woff|woff2|json|jpeg|jpg|gif|png|webp|avif)$/ }),
   ],
   server: {
     host: 'localhost',

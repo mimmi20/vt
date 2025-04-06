@@ -17,10 +17,36 @@ import autoprefixer from 'autoprefixer';
 import postcssDiscardComments from 'postcss-discard-comments';
 import postcssImport from 'postcss-import';
 import postColorConverter from 'postcss-color-converter';
-import postcssLightningcss from 'postcss-lightningcss';
+import stylehacks from 'stylehacks';
+import postcssRtlLogicalProperties from 'postcss-rtl-logical-properties';
+import rtlcss from 'rtlcss';
+import postcssMergeLonghand from 'postcss-merge-longhand';
+import postcssMergeRules from 'postcss-merge-rules';
+import postcssSvgo from 'postcss-svgo';
+import postcssNormalizeWhitespace from 'postcss-normalize-whitespace';
 
 export default function (ctx) {
   const root = process.cwd();
+
+  const SvgoOpts = {
+    plugins: [
+      {
+        name: 'preset-default',
+        params: {
+          overrides: {
+            removeViewBox: false,
+            removeComments: true,
+            cleanupNumericValues: {
+              floatPrecision: 2,
+            },
+            convertColors: {
+              shortname: false,
+            },
+          },
+        },
+      },
+    ],
+  };
 
   return {
     plugins: [
@@ -31,6 +57,12 @@ export default function (ctx) {
         selectors: ['before', 'after', 'first-letter', 'first-line'],
         'colon-notation': 'double',
       }),
+      postcssRtlLogicalProperties({ hDirection: 'LeftToRight', vDirection: 'TopToBottom' }),
+      rtlcss,
+      postcssMergeLonghand,
+      postcssMergeRules,
+      postcssSvgo(SvgoOpts),
+      postcssNormalizeWhitespace,
       postColorConverter({ outputColorFormat: 'rgb', ignore: ['rgb', 'hsl'], alwaysAlpha: true }),
       postcssPxtorem({
         propList: ['*'],
@@ -105,19 +137,7 @@ export default function (ctx) {
         debug: ctx.env !== 'production',
         logical: false,
       }),
-      postcssLightningcss({
-        lightningcssOptions: {
-          minify: false,
-          sourceMap: ctx.env !== 'production',
-          cssModules: false,
-          // Individually enable various drafts
-          drafts: {
-            // Enable css nesting (default: undefined)
-            nesting: true,
-            customMedia: true,
-          },
-        },
-      }),
+      stylehacks({ lint: false }),
       postcssColorRgbaFallback,
       autoprefixer({
         add: true,
@@ -136,9 +156,22 @@ export default function (ctx) {
         ? cssnano({
             preset: 'default',
             safe: true,
-            calc: false,
-            minifyFontWeight: false,
             precision: 2,
+            autoprefixer: false,
+            calc: false,
+            cssDeclarationSorter: false,
+            discardComments: false,
+            discardDuplicates: false,
+            discardEmpty: false,
+            discardOverridden: false,
+            mergeLonghand: false,
+            mergeRules: false,
+            minifyFontValues: false,
+            minifyFontWeight: false,
+            normalizeWhitespace: false,
+            orderedValues: false,
+            svgo: false,
+            uniqueSelectors: false,
           })
         : false,
     ],

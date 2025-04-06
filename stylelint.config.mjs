@@ -20,8 +20,8 @@ export default {
     'scss/operator-no-unspaced': null,
 
     // rules for logical properties and values
-    'plugin/use-logical-properties-and-values': true,
-    'plugin/use-logical-units': true,
+    'plugin/use-logical-properties-and-values': [true, { severity: 'warning', disableFix: true }],
+    'plugin/use-logical-units': [true, { severity: 'warning', disableFix: true }],
 
     'plugin/declaration-block-no-ignored-properties': true,
 
@@ -32,7 +32,7 @@ export default {
     // general rules
     'alpha-value-notation': null, // maybe later -> 'percentage',
     'at-rule-empty-line-before': ['always', { ignore: ['after-comment', 'first-nested', 'blockless-after-same-name-blockless'], except: ['first-nested'], ignoreAtRules: ['else'] }],
-    'color-function-notation': ['legacy', { ignore: ['with-var-inside'] }], // maybe change to 'modern'
+    'color-function-notation': ['modern', { ignore: ['with-var-inside'] }],
     'color-hex-length': 'short',
     'color-named': 'never',
     'color-no-invalid-hex': true,
@@ -46,6 +46,8 @@ export default {
     'function-name-case': ['lower', { severity: 'warning' }],
     'function-url-quotes': 'always',
     'length-zero-no-unit': true,
+    'media-feature-name-no-unknown': true,
+    'media-feature-name-no-vendor-prefix': null, // maybe later
     'media-feature-range-notation': 'prefix',
     'no-descending-specificity': null, // too much issues
     'no-duplicate-selectors': true,
@@ -57,9 +59,9 @@ export default {
     'selector-attribute-quotes': 'always',
     'selector-class-pattern': null, // maybe later
     'selector-id-pattern': null, // maybe later
-    'selector-max-compound-selectors': null, // maybe later -> [3, { severity: 'warning' }],
+    'selector-max-compound-selectors': [3, { severity: 'warning' }],
     'selector-not-notation': 'simple',
-    'selector-pseudo-element-colon-notation': 'single',
+    'selector-pseudo-element-colon-notation': 'double',
     'selector-type-case': ['lower', { severity: 'warning' }],
     'shorthand-property-no-redundant-values': true,
     'value-keyword-case': ['lower', { ignoreKeywords: ['currentColor', 'optimizeLegibility'], severity: 'warning', disableFix: true }],

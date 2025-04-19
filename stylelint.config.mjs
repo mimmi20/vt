@@ -5,7 +5,17 @@ import sortOrderSmacss from 'stylelint-config-property-sort-order-smacss/generat
 
 export default {
   extends: ['stylelint-config-standard-scss', 'stylelint-config-property-sort-order-smacss'],
-  plugins: ['stylelint-plugin-logical-css', 'stylelint-declaration-block-no-ignored-properties', 'stylelint-use-nesting', 'stylelint-no-unsupported-browser-features', 'stylelint-plugin-use-baseline', 'stylelint-no-indistinguishable-colors', 'stylelint-no-unresolved-module', 'stylelint-media-use-custom-media', 'stylelint-high-performance-animation'],
+  plugins: [
+    'stylelint-plugin-logical-css',
+    'stylelint-declaration-block-no-ignored-properties',
+    'stylelint-use-nesting',
+    'stylelint-no-unsupported-browser-features',
+    'stylelint-plugin-use-baseline',
+    'stylelint-no-indistinguishable-colors',
+    'stylelint-no-unresolved-module',
+    'stylelint-media-use-custom-media',
+    'stylelint-high-performance-animation',
+  ],
   rules: {
     // rules for scss
     'scss/at-extend-no-missing-placeholder': null, // maybe later
@@ -33,9 +43,9 @@ export default {
     'plugin/no-unsupported-browser-features': [
       true,
       {
-        'ignorePartialSupport': true,
+        ignorePartialSupport: true,
         severity: 'warning',
-      }
+      },
     ],
 
     'plugin/require-baseline': [
@@ -53,7 +63,7 @@ export default {
         allowEquivalentNotation: true,
         threshold: 3,
         severity: 'warning',
-      }
+      },
     ],
 
     'plugin/no-unresolved-module': {

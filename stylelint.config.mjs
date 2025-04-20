@@ -48,7 +48,7 @@ export default {
       },
     ],
 
-    'plugin/use-baseline': [
+    'plugin/require-baseline': [
       false,
       {
         // "available" can be "widely" (default) or "newly"

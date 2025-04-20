@@ -58,7 +58,7 @@ export default {
     ],
 
     'plugin/stylelint-no-indistinguishable-colors': [
-      true,
+      false,
       {
         allowEquivalentNotation: true,
         threshold: 3,

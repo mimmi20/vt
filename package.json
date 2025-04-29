@@ -41,7 +41,7 @@
     "@types/node": "^22.15.2",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.0",
-    "@typescript-eslint/typescript-estree": "^8.31.0",
+    "@typescript-eslint/typescript-estree": "^8.31.1",
     "@vheemstra/imagemin-avifenc": "^2.1.0",
     "@vheemstra/vite-plugin-imagemin": "^2.0.0",
     "@vitest/coverage-istanbul": "^3.1.2",

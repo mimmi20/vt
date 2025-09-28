@@ -40,7 +40,7 @@ updates:
     ignore:
       - dependency-name: "stylelint-config-standard-scss"
 
-    rebase-strategy: "auto"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "github-actions"
 
@@ -75,4 +75,4 @@ updates:
       - dependency-name: "mimmi20/ci"
       - dependency-name: "release-drafter/release-drafter"
 
-    rebase-strategy: "auto"
+    rebase-strategy: "disabled"
